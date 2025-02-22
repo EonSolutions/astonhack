@@ -1,0 +1,9 @@
+flask
+numpy
+requests
+cv2
+firebase_admin
+dotenv
+ultralytics
+transformers
+PIL
