@@ -1,0 +1,100 @@
+/* Profile Page Container */
+.profile-container {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  /* Title */
+  .profile-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  /* Profile Options */
+  .profile-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  /* Profile Buttons */
+  .profile-btn {
+    background: #f8f9fa;
+    border: none;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    color: black;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .profile-btn:hover {
+    background: #ddd;
+  }
+  
+  /* Icons */
+  .icon {
+    font-size: 22px;
+    color: #933ddd;
+  }
+  
+  /* Logout Button */
+  .logout {
+    background: #ff4d4d;
+    color: white;
+  }
+  
+  .logout:hover {
+    background: #cc0000;
+  }
+  
+  /* Bottom Navbar */
+  .bottom-navbar {
+    position: fixed;
+    bottom: 20px;
+    width: 90%;
+    max-width: 400px;
+    background: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Navbar Buttons */
+  .nav-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: black;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+  }
+  
+  .nav-btn:hover {
+    color: #555;
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }  

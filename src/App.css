@@ -1,0 +1,417 @@
+@font-face {
+  font-family: 'HorizonFont';
+  src: url('/src/assets/horizon.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* General Layout */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.wardrobe-container, body, html {
+  height: 100vh;
+  width: 100vw;
+  background: #f8f8f8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  font-family: 'HorizonFont', sans-serif;
+}
+
+/* Header */
+.wardrobe-header {
+  width: 100vw;
+  padding: 15px 0;
+  font-size: 30px;
+  font-weight: bold;
+  background: linear-gradient(to right, #933ddd, #ffffff);
+  text-align: center;
+  color: black;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth Scrolling for Main Content */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 70px;
+  padding: 16px;
+  width: 100%;
+  scroll-behavior: smooth;
+}
+
+/* Category Buttons */
+.category-buttons {
+  display: flex;
+  gap: 20px;
+  padding: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.category-btn {
+  padding: 12px 18px;
+  border: 2px solid black;
+  border-radius: 20px;
+  background: white;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.category-btn.active {
+  background: black;
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Hover & Click Effects */
+.category-btn:hover {
+  background: black;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Grid Layout
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  padding: 16px;
+} */
+
+.item-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Bottom Navbar */
+.bottom-navbar {
+  border-radius: 20px;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-around;
+  position: fixed;
+  bottom: 0;
+  width: 30%;
+  margin-bottom: 2%;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.bottom-navbar:hover {
+  transform: scale(1.05);
+}
+
+/* Navbar Buttons */
+.nav-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: black;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  justify-content: center;
+  outline: none;
+}
+
+.nav-btn:hover {
+  color: #933ddd;
+  transform: scale(1.2);
+}
+
+.nav-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.nav-btn:active {
+  outline: none;
+  box-shadow: none;
+}
+
+.empty-category-text {
+  text-align: center;
+  font-size: 20px;
+  margin-top: 20px;
+  color: #933ddd;
+}
+
+p {
+  text-align: center;
+  font-size: 16px;
+  margin-top: 5px;
+  color: #933ddd;
+}
+
+h3 {
+  color: #010b15;
+  text-align: center;
+  font-size: 20px;
+  margin-top: 20px;
+}
+
+/* Ensure the item grid layout stays uniform */
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Prevents large gaps */
+  gap: 10px; /* Reduces spacing between items */
+  padding: 20px;
+  width: 100%;
+  max-width: 1200px; /* Ensures grid doesn't stretch too much */
+  margin: 0 auto; /* Centers grid in the page */
+} 
+
+/* Make the item-card have a futuristic glassmorphic design */
+.item-card {
+  background: white;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 200px;
+  height: 290px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+/* Hover effect for interaction */
+.item-card:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Image container to ensure uniformity */
+.item-image-container {
+  width: 180px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to top, #222 10%, #444 90%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Fix image size & prevent tiny images from being too small */
+.item-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+/* Item Info */
+.item-info {
+  font-size: 14px;
+  color: #333;
+  width: 100%;
+  text-align: center;
+  font-family: 'HorizonFont', sans-serif;
+}
+
+/* Name Style */
+.item-info h3 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #010b15;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* Colour Information */
+.item-info p {
+  font-size: 14px;
+  font-weight: bold;
+  color: #c084fc; /* Neon purple */
+  text-transform: uppercase;
+}
+
+/* Popup Overlay - Grey Transparent Background */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8); /* Dark grey transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Fade out effect when closing */
+.popup-overlay.closing {
+  animation: fadeOut 0.3s ease-in-out forwards;
+}
+
+/* Popup Content */
+.popup-content {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  width: 400px;
+  text-align: center;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+  animation: scaleUp 0.3s ease-in-out;
+}
+
+/* Scale-down effect when closing */
+.popup-content.closing {
+  animation: scaleDown 0.3s ease-in-out forwards;
+}
+
+/* Upload Box */
+.upload-box {
+  background: #f8f9fa;
+  border: 2px dashed #c4c4c4; /* Dotted border */
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Change border color when dragging */
+.upload-box.dragging {
+  border-color: #58a34f;
+  background: #eafbe7;
+}
+
+/* Upload Icon */
+.upload-icon {
+  font-size: 40px;
+  color: #58a34f;
+}
+
+/* Upload Text */
+.upload-text {
+  font-size: 16px;
+  color: black;
+}
+
+/* Upload Button */
+.upload-btn {
+  background: #ccc;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.upload-btn:hover {
+  background: #bbb;
+}
+
+/* Take Photo Button - Center & Match Color Scheme */
+.take-photo-btn {
+  background: #933ddd; /* Match with your color scheme */
+  color: white;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%; /* Make it full width */
+  transition: all 0.2s;
+}
+
+.take-photo-btn:hover {
+  background: #7326b8; /* Darker shade for hover effect */
+}
+
+/* Camera Icon */
+.camera-icon {
+  font-size: 20px;
+}
+
+/* Camera Popup */
+.camera-popup {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Camera Preview Video */
+.camera-preview {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 8px;
+  background: black;
+}
+
+/* Close Button - Make it Visible */
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: black; /* Change to a darker color for visibility */
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  color: red;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes scaleDown {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(0.9); opacity: 0; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
