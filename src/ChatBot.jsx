@@ -105,13 +105,14 @@ export default function ChatBotPage() {
     
             const data = await response.json();
             let recommendation = data.recommendation;
-            let r = data.response;
+            let r = data.reply;
             let recommended_items = [];
+            console.log(data);
     
             if (recommendation && recommendation.length > 0) {
               try {
                 const args = JSON.parse(recommendation[0].function.arguments);
-                r = r || args.message || `Here's an outfit idea for ${input}:`;
+                r ||= args.message;
     
                 const [allItems, allCategories] = await getAllCategories();
                 recommended_items = args.recommendation
@@ -120,10 +121,6 @@ export default function ChatBotPage() {
               } catch (error) {
                 console.error("Error parsing recommendation data:", error);
               }
-            }
-    
-            if (!r && recommended_items.length > 0) {
-              r = `Here's what you could wear for ${input}:`;
             }
     
             const botMessage = {
