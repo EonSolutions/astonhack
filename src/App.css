@@ -83,19 +83,6 @@
   transform: scale(1.1);
 }
 
-/* Grid Layout
-.item-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 16px;
-  padding: 16px;
-} */
-
-.item-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
 /* Bottom Navbar */
 .bottom-navbar {
   border-radius: 20px;
@@ -164,30 +151,71 @@ h3 {
   margin-top: 20px;
 }
 
-/* Ensure the item grid layout stays uniform */
 .item-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Prevents large gaps */
-  gap: 10px; /* Reduces spacing between items */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Centers the cards */
+  gap: 20px; /* Adds spacing between each card */
   padding: 20px;
   width: 100%;
-  max-width: 1200px; /* Ensures grid doesn't stretch too much */
-  margin: 0 auto; /* Centers grid in the page */
-} 
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-/* Make the item-card have a futuristic glassmorphic design */
 .item-card {
   background: white;
   padding: 16px;
   border-radius: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
-  width: 200px;
-  height: 290px;
+  width: 250px;
+  height: 400px;
+  display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+/* 🔹 Make the image container take more space */
+.item-image-container {
+  width: 100%;
+  height: 100%; /* Takes more of the card space */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f1f1;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* 🔹 Image Styling */
+.item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensure proper scaling */
+  border-radius: 8px;
+  background-color: transparent;
+}
+
+/* 🔹 Title Styling */
+.item-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: black;
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+
+/* 🔹 Description Section */
+.item-description {
+  font-size: 13px;
+  color: #7b4ac6;
+  font-weight: bold;
+  text-align: center;
+  padding: 5px;
+  word-wrap: break-word;
+  max-width: 100%;
 }
 
 /* Hover effect for interaction */
@@ -208,25 +236,7 @@ h3 {
   overflow: hidden;
 }
 
-/* Fix image size & prevent tiny images from being too small */
-.item-image {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  border-radius: 8px;
-}
-
-/* Item Info */
-.item-info {
-  font-size: 14px;
-  color: #333;
-  width: 100%;
-  text-align: center;
-  font-family: 'HorizonFont', sans-serif;
-}
-
-/* Name Style */
-.item-info h3 {
+h3 {
   font-size: 18px;
   font-weight: bold;
   color: #010b15;
@@ -234,8 +244,7 @@ h3 {
   margin-bottom: 4px;
 }
 
-/* Colour Information */
-.item-info p {
+p {
   font-size: 14px;
   font-weight: bold;
   color: #c084fc; /* Neon purple */
@@ -414,4 +423,20 @@ h3 {
 @keyframes slideUp {
   from { transform: translateY(30px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+/* 🔹 'See Description' Button */
+.see-description-btn {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: underline;
+  margin-top: 5px;
+  transition: color 0.2s;
+}
+
+.see-description-btn:hover {
+  color: #0056b3;
 }
