@@ -181,25 +181,25 @@ export default function App() {
       console.warn("⚠️ No file selected!");
       return;
     }
-  
+
     setIsProcessing(true); // Show loading animation
-  
+
     const formData = new FormData();
     formData.append("image", file);
-  
+
     try {
       // Upload image to imgBB
       const imgBBResponse = await fetch(`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_KEY}`, {
         method: "POST",
         body: formData,
       });
-  
+
       const imgBBData = await imgBBResponse.json();
-  
+
       if (imgBBData.success) {
         const imageUrl = imgBBData.data.url;
         console.log("✅ Image uploaded to imgBB:", imageUrl);
-  
+
         // Store the image URL in Firestore
         const newItem = {
           id: new Date().getTime().toString(), // Generate a unique ID
@@ -207,32 +207,32 @@ export default function App() {
           description: "Added via file upload", // Default description
           image: imageUrl,
         };
-  
+
         await addDoc(collection(db, "shirts"), newItem);
         console.log("✅ Photo URL saved to Firestore database.");
-  
+
         // Save the added item to localStorage
         const existingItems = JSON.parse(localStorage.getItem("addedItems")) || [];
         const updatedItems = [...existingItems, newItem];
         localStorage.setItem("addedItems", JSON.stringify(updatedItems));
-  
+
         // Send image to Flask for processing
         const flaskResponse = await fetch("http://127.0.0.1:5000/process_image", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ image_url: imageUrl }),
         });
-  
+
         const flaskData = await flaskResponse.json();
         console.log("✅ Flask Response:", flaskData);
-  
+
         // Show success message
         setShowSuccess(true);
         setShowPopup(false);
-  
+
         // Immediately show the loading component
         setIsProcessing(true);
-  
+
         // Refresh the page after a short delay
         setTimeout(() => {
           window.location.reload();
@@ -320,11 +320,11 @@ export default function App() {
             <div className="wardrobe-container">
               {/* Show loading component if processing or refreshing */}
               {(loading || isProcessing) && <LoadingComponent />}
-  
+
               {!loading && !isProcessing && (
                 <>
                   <header className="wardrobe-header">My Wardrobe</header>
-  
+
                   <div className="main-content">
                     <div className="category-buttons">
                       {categories.map((category) => (
@@ -337,7 +337,7 @@ export default function App() {
                         </button>
                       ))}
                     </div>
-  
+
                     {items.length > 0 ? (
                       <div className="item-grid">
                         {items
@@ -347,9 +347,9 @@ export default function App() {
                               <div className="item-image-container">
                                 <img src={item.image} alt={item.name} className="item-image" />
                               </div>
-  
+
                               <h3 className="item-title">{item.name}</h3>
-  
+
                               <div className="item-description">
                                 {item.description.split(" ").length > 10 ? (
                                   <div>
@@ -358,7 +358,7 @@ export default function App() {
                                     ) : (
                                       <p>{item.description}</p>
                                     )}
-  
+
                                     <button
                                       className="see-description-btn"
                                       onClick={() => toggleDescription(item.id)}
@@ -379,15 +379,15 @@ export default function App() {
                       </div>
                     )}
                   </div>
-  
+
                   <div className="bottom-navbar">
                     <button className="nav-btn"><AiOutlineHome size={30} /></button>
-                    <button className="nav-btn"><AiOutlineMessage size={30} /></button>
+                    <Link to="/chat" className="nav-btn"><AiOutlineMessage size={30} /></Link>
                     <button className="nav-btn" onClick={() => setShowPopup(true)}><AiOutlinePlus size={30} /></button>
                     <Link to="/dashboard" className="nav-btn"><AiOutlineBarChart size={30} /></Link>
                     <Link to="/profile" className="nav-btn"><AiOutlineUser size={30} /></Link>
                   </div>
-  
+
                   {showPopup && (
                     <div className={`popup-overlay ${isUploadClosing ? "closing" : ""}`} onClick={closePopup}>
                       <div className={`popup-content ${isUploadClosing ? "closing" : ""}`} onClick={(e) => e.stopPropagation()}>
@@ -411,7 +411,7 @@ export default function App() {
                             onChange={handleUploadPhoto}
                           />
                         </div>
-  
+
                         {/* Take Photo Button */}
                         <button className="take-photo-btn" onClick={handleOpenCamera}>
                           <AiOutlineCamera className="camera-icon" /> Take a Photo
@@ -419,7 +419,7 @@ export default function App() {
                       </div>
                     </div>
                   )}
-  
+
                   {/* Camera Popup */}
                   {showCameraPopup && (
                     <div className="popup-overlay" onClick={() => setShowCameraPopup(false)}>
@@ -431,13 +431,16 @@ export default function App() {
                       </div>
                     </div>
                   )}
-  
-                  {showSuccess && (
-                    <div className="success-toast">
-                      ✅ Your outfit has been added!
+
+                  {isProcessing && (
+                    <div className="loading-overlay">
+                      <div className="loading-container">
+                        <div className="loading-spinner"></div>
+                        <p className="loading-text">Processing image...</p>
+                      </div>
                     </div>
                   )}
-  
+
                   {showAddedItemsModal && (
                     <AddedItemsModal addedItems={addedItems} onClose={() => setShowAddedItemsModal(false)} />
                   )}
@@ -448,6 +451,7 @@ export default function App() {
         />
         <Route path="/profile" element={<Profile />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/chat" element={<ChatBotPage />} />
       </Routes>
     </Router>
   );
