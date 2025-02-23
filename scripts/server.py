@@ -94,10 +94,12 @@ def process_image():
         
             # 3.2 Add to collection
 
+            description = feat.feat(image, os.getenv('OPENAI_KEY'))
+
             doc_ref = collection.add({
                 'image': uploaded_image_url,
-                'description': feat.feat(image, os.getenv('OPENAI_KEY')),
-                'name': feat2.feat2(image, os.getenv('OPENAI_KEY'))
+                'description': description,
+                'name': feat2.feat2(image, os.getenv('OPENAI_KEY'), description)
             })
             
             results.append({
