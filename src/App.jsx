@@ -20,7 +20,6 @@ export default function App() {
   const [isUploadClosing, setIsUploadClosing] = useState(false);
   const [showCameraPopup, setShowCameraPopup] = useState(false);
   const [videoStream, setVideoStream] = useState(null);
-  const [expandedDescriptions, setExpandedDescriptions] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -72,8 +71,6 @@ export default function App() {
       localStorage.removeItem("addedItems"); // Clear localStorage
       onClose(); // Close the modal
     };
-
-    console.log(addedItems);
 
     return (
       <div className="popup-overlay">
@@ -383,35 +380,6 @@ export default function App() {
                               </div>
 
                               <h3 className="item-title">{item.name}</h3>
-
-                              {/* <div className="item-description">
-                                {item.description.split(" ").length > 10 ? (
-                                  <div>
-                                    {!expandedDescriptions[item.id] ? (
-                                      <p>
-                                        {item.description
-                                          .split(" ")
-                                          .slice(0, 10)
-                                          .join(" ")}
-                                        ...
-                                      </p>
-                                    ) : (
-                                      <p>{item.description}</p>
-                                    )}
-
-                                    <button
-                                      className="see-description-btn"
-                                      onClick={() => toggleDescription(item.id)}
-                                    >
-                                      {expandedDescriptions[item.id]
-                                        ? "Hide Description"
-                                        : "See Description"}
-                                    </button>
-                                  </div>
-                                ) : (
-                                  <p>{item.description}</p>
-                                )}
-                              </div> */}
                             </div>
                           ))}
                       </div>
