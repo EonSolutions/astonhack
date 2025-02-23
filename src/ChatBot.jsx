@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import "./ChatBot.css";
 import { getAllCategories } from "./lib/categories";
-import { FaPaperPlane } from "react-icons/fa";
+import { FaArrowLeft, FaPaperPlane } from "react-icons/fa"; // Import Icons
 
 export default function ChatBotPage() {
+  const navigate = useNavigate(); // Initialize navigation hook
   const [wardrobe, setWardrobe] = useState([]);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -13,8 +15,7 @@ export default function ChatBotPage() {
   useEffect(() => {
     (async () => {
       const [items, _] = await getAllCategories();
-      const wardrobe = items.map(({ id, description }) => [id, description]);
-      setWardrobe(wardrobe);
+      setWardrobe(items.map(({ id, description }) => [id, description]));
     })();
   }, []);
 
@@ -33,8 +34,7 @@ export default function ChatBotPage() {
 
   const handleSend = async () => {
     if (input.trim()) {
-      const userMessage = { text: input, sender: "user" };
-      setMessages((prev) => [...prev, userMessage]);
+      setMessages((prev) => [...prev, { text: input, sender: "user" }]);
       setInput("");
       setLoading(true);
 
@@ -47,8 +47,7 @@ export default function ChatBotPage() {
         });
 
         const data = await response.json();
-        const botMessage = { text: data.response || "No response from bot.", sender: "bot" };
-        setMessages((prev) => [...prev, botMessage]);
+        setMessages((prev) => [...prev, { text: data.response || "No response from bot.", sender: "bot" }]);
       } catch (error) {
         console.error("Error fetching bot response:", error);
         setMessages((prev) => [...prev, { text: "Error connecting to the bot.", sender: "bot" }]);
@@ -69,6 +68,9 @@ export default function ChatBotPage() {
   return (
     <div className="chatbot-container">
       <div className="chatbot-header">
+        <button className="back-button" onClick={() => navigate("/")}>
+          <FaArrowLeft />
+        </button>
         <h2>AI Stylist</h2>
       </div>
       <div className="chatbot-messages">
@@ -81,14 +83,7 @@ export default function ChatBotPage() {
         <div ref={messagesEndRef} />
       </div>
       <div className="chatbot-input">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Type a message..."
-          disabled={loading}
-        />
+        <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={handleKeyPress} placeholder="Type a message..." disabled={loading} />
         <button onClick={handleSend} disabled={loading}>
           <FaPaperPlane />
         </button>
