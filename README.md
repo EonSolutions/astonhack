@@ -46,8 +46,11 @@ Thank you for the opportunity to explore the intersection of fashion, AI, and su
 ## Contact
 
 👤 Kerem Uygun – keremuygun86@gmail.com
-👤 Tom Shtaseo – veschi@gmail.com
+
+👤 Tom Shtasel – veschi@gmail.com
+
 👤 Wilbert Tham – wilbertthxm@gmail.com
+
 👤 Harry Day – hdkeyworth@gmail.com
 
 
