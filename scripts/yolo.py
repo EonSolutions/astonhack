@@ -6,8 +6,7 @@ import requests
 # Load the YOLOv8 segmentation model
 model = YOLO('deepfashion2_yolov8s-seg.pt')
 
-
-def yolo(image_path_or_url):
+def yolo(image_path_or_url, min_width=50, min_height=50):
     # Check if the input is a URL
     if image_path_or_url.startswith('http://') or image_path_or_url.startswith('https://'):
         # Download the image from the URL
@@ -50,6 +49,10 @@ def yolo(image_path_or_url):
             # Find the bounding box of the mask
             coords = cv2.findNonZero(mask_img)
             x, y, w, h = cv2.boundingRect(coords) if coords is not None else (0, 0, orig_w, orig_h)
+
+            # Filter out small bounding boxes
+            if w < min_width or h < min_height:
+                continue
 
             # Crop the original image and mask
             cropped_img = orig_img[y:y + h, x:x + w]
