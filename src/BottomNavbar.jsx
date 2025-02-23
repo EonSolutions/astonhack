@@ -39,11 +39,6 @@ const BottomNavbar = ({ hasMiddle, setShowPopup }) => {
         <AiOutlineMessage size={30} />
       </button>
 {/* Always show the shirt button on the dashboard */}
-{hasMiddle || window.location.pathname === "/dashboard" ? (
-  <Link to="/outfit" className="nav-btn"> 
-    <AiOutlineSkin size={30} />
-  </Link>
-) : null}
 
 {/* Show the plus button only if hasMiddle is true */}
 {hasMiddle && (
