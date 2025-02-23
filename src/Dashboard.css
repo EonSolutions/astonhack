@@ -44,7 +44,7 @@ h3 {
 .extra-card {
   background: white;
   padding: 20px;
-  border-radius: 12px;
+  border-radius: 12px;  
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
   width: 100%;
@@ -62,3 +62,4 @@ h3 {
       height: auto; /* Allow natural height for small screens */
   }
 }
+

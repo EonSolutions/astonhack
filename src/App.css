@@ -97,53 +97,6 @@ p {
   transform: scale(1.1);
 }
 
-/* Bottom Navbar */
-.bottom-navbar {
-  border-radius: 20px;
-  background: white;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-around;
-  position: fixed;
-  bottom: 0;
-  width: 30%;
-  margin-bottom: 2%;
-  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease-in-out;
-}
-
-.bottom-navbar:hover {
-  transform: scale(1.05);
-}
-
-/* Navbar Buttons */
-.nav-btn {
-  background: none;
-  border: none;
-  font-size: 28px;
-  cursor: pointer;
-  color: black;
-  transition: all 0.3s ease-in-out;
-  display: flex;
-  justify-content: center;
-  outline: none;
-}
-
-.nav-btn:hover {
-  color: #933ddd;
-  transform: scale(1.2);
-}
-
-.nav-btn:focus {
-  outline: none;
-  box-shadow: none;
-}
-
-.nav-btn:active {
-  outline: none;
-  box-shadow: none;
-}
-
 .empty-category-text {
   text-align: center;
   font-size: 20px;

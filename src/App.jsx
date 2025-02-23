@@ -87,27 +87,18 @@ export default function App() {
       onClose(); // Close the modal
     };
 
-    console.log(addedItems);
-
     return (
-      <div className="popup-overlay">
+      <div className="popup-overlay" onClick={handleClose}>
         <div className="popup-content" onClick={(e) => e.stopPropagation()}>
           <h3>Items Added Successfully!</h3>
-          <ul className="outfit-list">
+          <ul>
             {addedItems.map((item) => (
-              <div key={item.id} className="outfit-item">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="outfit-image"
-                />
-                <div className="outfit-info">
-                  <h3>{item.name}</h3>{" "}
-                  <p>{item.description}</p>
-                </div>
-              </div>
+              <li key={item.id}>
+                <strong>{item.name}</strong> - {item.description}
+              </li>
             ))}
           </ul>
+          {/* Move the Close button here */}
           <button className="close-btn" onClick={handleClose}>
             Close
           </button>
@@ -117,7 +108,7 @@ export default function App() {
   };
 
   const handleTakePhoto = () => {
-    // console.log("📸 Capturing photo...");
+    console.log("📸 Capturing photo...");
 
     if (!videoRef.current || !canvasRef.current) {
       console.warn("⚠️ Video or Canvas element not found!");
@@ -129,7 +120,7 @@ export default function App() {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-    // console.log("✅ Photo captured and drawn onto canvas.");
+    console.log("✅ Photo captured and drawn onto canvas.");
 
     canvas.toBlob(async (blob) => {
       if (!blob) {
@@ -178,33 +169,15 @@ export default function App() {
           const flaskData = await flaskResponse.json();
           console.log("✅ Flask Response:", flaskData);
 
-          // Wait 100ms
-          await new Promise((resolve) => setTimeout(resolve, 100));
-
-          const [allItems, allCategories] = await getAllCategories();
-
-          setItems(allItems);
-          setCategories(allCategories);
-          setSelectedCategory(allCategories[0] || "");
-          setLoading(false); // Data fetching is complete
-
-          if (flaskData.type === "success") {
-            setAddedItems(
-              flaskData.results.map((i) =>
-                allItems.find((c) => c.id === i.itemid)
-              )
-            );
-          }
-
           // Show success message
           setShowSuccess(true);
           setShowPopup(false);
-          setShowAddedItemsModal(true);
+          setTimeout(() => {
+            setShowSuccess(false);
+            window.location.reload();
+          }, 15000); // Refresh after animation ends
 
-          // setTimeout(() => {
-          //   setShowSuccess(false);
-          //   window.location.reload();
-          // }, 1500); // Refresh after animation ends
+          alert("✅ Photo uploaded and processed successfully!");
         } else {
           console.error("❌ Error uploading to imgBB:", imgBBData);
         }
@@ -242,6 +215,7 @@ export default function App() {
 
       if (imgBBData.success) {
         const imageUrl = imgBBData.data.url;
+        console.log("✅ Image uploaded to imgBB:", imageUrl);
 
         // Store the image URL in Firestore
         const newItem = {
@@ -279,10 +253,6 @@ export default function App() {
 
         // Immediately show the loading component
         setIsProcessing(true);
-
-        if (flaskData.type === "success") {
-          setAddedItems(flaskData.results);
-        }
 
         // Refresh the page after a short delay
         setTimeout(() => {
@@ -407,7 +377,7 @@ export default function App() {
 
                               <h3 className="item-title">{item.name}</h3>
 
-                              {/* <div className="item-description">
+                              <div className="item-description">
                                 {item.description.split(" ").length > 10 ? (
                                   <div>
                                     {!expandedDescriptions[item.id] ? (
@@ -434,7 +404,7 @@ export default function App() {
                                 ) : (
                                   <p>{item.description}</p>
                                 )}
-                              </div> */}
+                              </div>
                             </div>
                           ))}
                       </div>
