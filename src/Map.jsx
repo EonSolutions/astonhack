@@ -10,6 +10,7 @@ import "leaflet/dist/leaflet.css";
 import { FiClock } from "react-icons/fi";
 import { FaRegStar } from "react-icons/fa";
 import "./Map.css"; // Import the CSS file for styling
+import BottomNavbar from "./BottomNavbar";
 
 const MapView = () => {
   const [position, setPosition] = useState([
@@ -61,6 +62,7 @@ const MapView = () => {
   return (
     <>
       <header className="wardrobe-header">Sell My Clothes</header>
+      <BottomNavbar hasMiddle={false} setShowPopup={undefined}/>
       <div
         className="map-container"
         style={{

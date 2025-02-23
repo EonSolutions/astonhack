@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./ChatBot.css";
 import { getAllCategories } from "./lib/categories";
 import { FaArrowLeft, FaPaperPlane } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 export default function ChatBotPage() {
   const navigate = useNavigate();
@@ -201,7 +202,12 @@ export default function ChatBotPage() {
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="chatbot-input">
+      <motion.div
+        className="chatbot-input"
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 50 }}
+      >
         <input
           type="text"
           value={input}
@@ -213,7 +219,7 @@ export default function ChatBotPage() {
         <button onClick={handleSend} disabled={loading}>
           <FaPaperPlane />
         </button>
-      </div>
+      </motion.div>
     </div>
   );
 }

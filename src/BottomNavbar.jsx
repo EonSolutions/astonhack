@@ -22,7 +22,7 @@ const BottomNavbar = ({ hasMiddle, setShowPopup }) => {
     // Wait for the animation to complete before navigating
     setTimeout(() => {
       navigate("/chat");
-    }, 800); // Adjust if you change the animation duration
+    }, 500); // Adjust if you change the animation duration
   };
 
   return (
@@ -68,14 +68,14 @@ const BottomNavbar = ({ hasMiddle, setShowPopup }) => {
             initial={{ scale: 0 }}
             animate={{ scale: 100 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeIn" }}
+            transition={{ duration: 0.5, ease: "easeIn" }}
             style={{
               position: "fixed",
               top: "50%",
               left: "50%",
               width: 30,
               height: 30,
-              backgroundColor: "#ffffff", // White color for the wipe
+              backgroundColor: "#f8f8f8", // White color for the wipe
               borderRadius: "50%",
               transform: "translate(-50%, -50%)",
               pointerEvents: "none",

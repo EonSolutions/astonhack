@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs, getFirestore, query, orderBy } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  query,
+  orderBy,
+} from "firebase/firestore";
 import { Link } from "react-router-dom";
 import OutfitHistoryCard from "./HistoryCard";
 import OutfitChartCard from "./ChartCard";
@@ -31,17 +37,21 @@ export default function Dashboard() {
         "short_sleeve_dress",
         "long_sleeve_dress",
         "vest_dress",
-        "sling_dress"
+        "sling_dress",
       ];
 
       try {
         for (const category of collections) {
           console.log(`Fetching documents from collection: ${category}`);
 
-          const clothesQuery = query(collection(db, category), orderBy("date", "desc"));
+          const clothesQuery = query(
+            collection(db, category),
+            orderBy("date", "desc")
+          );
           const querySnapshot = await getDocs(clothesQuery);
 
-          categoryCount[category] = (categoryCount[category] || 0) + querySnapshot.size;
+          categoryCount[category] =
+            (categoryCount[category] || 0) + querySnapshot.size;
 
           const collectionItems = querySnapshot.docs.map((doc) => ({
             id: doc.id,
@@ -67,7 +77,6 @@ export default function Dashboard() {
 
         console.log("📊 Outfit Category Breakdown:", formattedCategoryData);
         setCategoryData(formattedCategoryData);
-
       } catch (error) {
         console.error("❌ Error fetching collections:", error);
       }
