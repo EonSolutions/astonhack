@@ -10,6 +10,7 @@ import json
 import firebase_admin
 from firebase_admin import credentials, firestore
 from dotenv import load_dotenv
+from datetime import datetime
 from openai import OpenAI
 
 # Load environment variables
@@ -151,7 +152,8 @@ def process_image():
             doc_ref = collection.add({
                 'image': uploaded_image_url,
                 'description': description,
-                'name': feat2.feat2(image, os.getenv('OPENAI_KEY'), description)
+                'name': feat2.feat2(image, os.getenv('OPENAI_KEY'), description),
+                'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             })
             
             results.append({

@@ -1,31 +1,57 @@
 .history-card {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 100%;
-  }
-  
-  /* Outfit Card */
-  .outfit-item {
-    display: flex;
-    align-items: center;
-    background: #f8f9fa;
-    padding: 12px;
-    border-radius: 12px;
-    transition: all 0.3s ease-in-out;
-  }
-  
-  .outfit-item:hover {
-    background: #ddd;
-  }
-  
-  /* Outfit Image */
-  .outfit-image {
-    width: 80px;
-    height: 80px;
-    border-radius: 8px;
-    object-fit: cover;
-    margin-right: 12px;
-  }  
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 100%;
+}
+
+/* Outfit Card */
+.outfit-item {
+  display: flex;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 12px;
+  transition: all 0.3s ease-in-out;
+}
+
+.outfit-item:hover {
+  background: #ddd;
+}
+
+/* Outfit Image */
+.outfit-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-right: 12px;
+}
+
+/* Make the icon and text align horizontally and center vertically */
+.date-info {
+  display: flex;        /* Place icon + text in a row */
+  align-items: center;  /* Vertically center them */
+  gap: 8px;             /* Spacing between icon and text */
+}
+
+/* Optional: Customize icon size or color */
+.date-info .icon {
+  font-size: 1.2rem;  /* Adjust icon size */
+  color: #777;        /* Icon color (example) */
+}
+
+/* If you want the entire outfit info in a vertical stack, you can keep it default.
+   Or if you want name & date side-by-side, wrap them in a container & use flex.
+*/
+.outfit-info {
+  display: flex;
+  flex-direction: column; /* Name on top, date on bottom */
+  /* or row if you prefer them in one line:
+     flex-direction: row;
+     justify-content: space-between;
+     align-items: center;
+  */
+}

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { collection, getDocs, getFirestore, query, orderBy, limit } from "firebase/firestore";
+import { AiOutlineHome, AiOutlineBarChart, AiOutlinePlus, AiOutlineUser, AiOutlineMessage } from "react-icons/ai";
+import { Link } from "react-router-dom";
 import OutfitHistoryCard from "./HistoryCard";
 import OutfitChartCard from "./ChartCard";
 import ExtraCard from "./ExtraCard";
@@ -78,6 +80,8 @@ export default function Dashboard() {
   }, []);
 
   return (
+
+    <div>
     <div className="dashboard-container">
       {/* Left Side - Outfit History */}
       <div className="left-column">
@@ -90,5 +94,24 @@ export default function Dashboard() {
         <ExtraCard />
       </div>
     </div>
+
+    <div className="bottom-navbar">
+      <button className="nav-btn" onClick={() => (window.location.href = "http://localhost:5173/")}>
+        <AiOutlineHome size={30} />
+      </button>
+      <Link to="/chat" className="nav-btn">
+        <AiOutlineMessage size={30} />
+      </Link>
+      <button className="nav-btn" onClick={() => setShowPopup(true)}>
+        <AiOutlinePlus size={30} />
+      </button>
+      <Link to="/dashboard" className="nav-btn">
+        <AiOutlineBarChart size={30} />
+      </Link>
+      <Link to="/profile" className="nav-btn">
+        <AiOutlineUser size={30} />
+      </Link>
+    </div>
+  </div>
   );
 }
