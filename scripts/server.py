@@ -44,8 +44,9 @@ def upload_cv2_img_to_imgbb(cv2_image):
     return res.json()['data']['url']
 
 import yolo
-import clip
+import blip
 import feat
+import feat2
 
 @app.route('/process_image', methods=['POST'])
 def process_image():
@@ -61,7 +62,7 @@ def process_image():
 
         results = []
 
-        # 2. CLIP
+        # 2. BLIP
         for output in outputs:
             image = output['image']
             category = output['category']
@@ -76,7 +77,7 @@ def process_image():
 
                 # 2.2 Get probabilities
                 options = [doc['description'] for doc in docs]
-                probsarray = clip.image_clip(image, options)[0]
+                probsarray = blip.image_blip(image, options)
                 max_index = np.argmax(probsarray)
                 if probsarray[max_index] > 0.85:
                     results.append({
@@ -92,10 +93,11 @@ def process_image():
             print("Upload complete.")
         
             # 3.2 Add to collection
+
             doc_ref = collection.add({
                 'image': uploaded_image_url,
                 'description': feat.feat(image, os.getenv('OPENAI_KEY')),
-                'name': 'Unknown'
+                'name': feat2.feat2(image, os.getenv('OPENAI_KEY'))
             })
             
             results.append({
