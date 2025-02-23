@@ -5,6 +5,7 @@ import {
   AiOutlinePlus,
   AiOutlineUser,
   AiOutlineMessage,
+  AiOutlineSkin,
 } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -37,15 +38,25 @@ const BottomNavbar = ({ hasMiddle, setShowPopup }) => {
       <button className="nav-btn" onClick={handleChatClick}>
         <AiOutlineMessage size={30} />
       </button>
+{/* Always show the shirt button on the dashboard */}
+{hasMiddle || window.location.pathname === "/dashboard" ? (
+  <Link to="/outfit" className="nav-btn"> 
+    <AiOutlineSkin size={30} />
+  </Link>
+) : null}
 
-      {hasMiddle && (
-        <button className="nav-btn" onClick={() => setShowPopup(true)}>
-          <AiOutlinePlus size={30} />
-        </button>
-      )}
+{/* Show the plus button only if hasMiddle is true */}
+{hasMiddle && (
+  <button className="nav-btn" onClick={() => setShowPopup(true)}>
+    <AiOutlinePlus size={30} />
+  </button>
+)}
+
+      
       <Link to="/dashboard" className="nav-btn">
         <AiOutlineBarChart size={30} />
       </Link>
+      
       <Link to="/profile" className="nav-btn">
         <AiOutlineUser size={30} />
       </Link>

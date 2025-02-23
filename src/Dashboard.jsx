@@ -78,21 +78,22 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className="dashboard-container">
-        {/* Left Side - Outfit History */}
-        <div className="left-column">
-          <OutfitHistoryCard outfitHistory={outfitHistory} />
-        </div>
-
-        {/* Right Side - Pie Chart (Top) & Extra Info (Bottom) */}
-        <div className="right-column">
-          <OutfitChartCard categoryData={categoryData} />
-          <ExtraCard />
-        </div>
-      </div>
-
-      {/* 🔹 Use the new reusable navbar component */}
-      <BottomNavbar hasMiddle={false} setShowPopup={undefined} />
+  <div className="dashboard-container">
+    {/* Left Side - Outfit History */}
+    <div className="left-column">
+      <OutfitHistoryCard outfitHistory={outfitHistory} />
     </div>
+
+    {/* Right Side - Pie Chart (Top) & Extra Info (Bottom) */}
+    <div className="right-column">
+      <OutfitChartCard categoryData={categoryData} />
+      <ExtraCard />
+    </div>
+  </div>
+
+  {/* 🔹 Ensure the shirt button is always visible by setting hasMiddle to false */}
+  <BottomNavbar hasMiddle={false} />
+</div>
+
   );
 }
