@@ -11,7 +11,13 @@ import { getAllCategories } from "./lib/categories";
 import MapPage from "./Map";
 import BottomNavbar from "./BottomNavbar";
 
+const loadingPrompts = [
+  "Loading your wardrobe..."
+];
+
 export default function App() {
+  const [loadingPrompt, setLoadingPrompt] = useState(loadingPrompts[0]);
+  const [fade, setFade] = useState(true);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("long_sleeve_top");
   const [items, setItems] = useState([]);
@@ -312,7 +318,9 @@ export default function App() {
     <div className="loading-overlay">
       <div className="loading-container">
         <div className="loading-spinner"></div>
-        <p className="loading-text">Loading wardrobe...</p>
+        <p className={`loading-text ${fade ? "fade-in" : "fade-out"}`}>
+          {loadingPrompt}
+        </p>
       </div>
     </div>
   );

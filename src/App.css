@@ -488,3 +488,28 @@ p {
   object-fit: cover;
   margin-right: 12px;
 }  
+
+.loading-text {
+  transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+}
+
+.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-out {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
