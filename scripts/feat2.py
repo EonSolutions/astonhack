@@ -6,7 +6,7 @@ def encode_image_from_opencv(cv_image):
     _, buffer = cv2.imencode('.jpg', cv_image)
     return base64.b64encode(buffer).decode("utf-8")
 
-def feat2(cv_image, key):
+def feat2(cv_image, key, description):
     image_base64 = encode_image_from_opencv(cv_image)
     
     headers = {
@@ -14,15 +14,14 @@ def feat2(cv_image, key):
         "Content-Type": "application/json"
     }
     
-    prompt = "Give a short name to this clothing item"
+    prompt = ("Give a short name to this clothing item, based off of the following description." + description)
 
     data = {
         "model": "gpt-4-turbo",
         "messages": [
             {"role": "system", "content": "You are an AI which uses telegraphic speech to assign a concise name to a clothing item, from its colour and type"},
             {"role": "user", "content": [
-                {"type": "text", "text": prompt},
-                {"type": "image_url", "image_url": { "url" : f"data:image/jpeg;base64,{image_base64}"}}
+                {"type": "text", "text": prompt}
             ]}
         ],
         "max_tokens": 200

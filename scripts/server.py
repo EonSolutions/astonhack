@@ -146,10 +146,12 @@ def process_image():
         
             # 3.2 Add to collection
 
+            description = feat.feat(image, os.getenv('OPENAI_KEY'))
+
             doc_ref = collection.add({
                 'image': uploaded_image_url,
-                'description': feat.feat(image, os.getenv('OPENAI_KEY')),
-                'name': feat2.feat2(image, os.getenv('OPENAI_KEY'))
+                'description': description,
+                'name': feat2.feat2(image, os.getenv('OPENAI_KEY'), description)
             })
             
             results.append({
@@ -187,7 +189,7 @@ def init_session(wardrobe):
     # Initialize session conversation history if not already set.
     if 'messages' not in session:
         session['messages'] = [
-            {"role": "system", "content": "You are an assistant that can recommend outfits. Only if they ask for an outfit, you will provide with maximum 1 recommendation. If so, you will provide the firebase item IDs from the wardrobe below:\n\n" + wardrobe}]
+            {"role": "system", "content": "You are an assistant that can recommend outfits. Only if they ask for an outfit, you will provide with maximum 1 recommendation. The recommendation will consist ONLY of the following items:\n\n" + wardrobe}]
 
 
 @app.route('/chat', methods=['POST'])

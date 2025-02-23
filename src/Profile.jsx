@@ -1,8 +1,9 @@
 import React from "react";
-import { AiOutlineHeart, AiOutlineSetting, AiOutlineLogout, AiOutlineGift, AiOutlineUser, AiOutlineMessage } from "react-icons/ai";
+import { AiOutlineHeart, AiOutlineSetting, AiOutlineLogout, AiOutlineGift, AiOutlineUser, AiOutlineMessage, AiOutlineArrowLeft } from "react-icons/ai";
 import "./Profile.css";
 
 export default function ProfilePage() {
+
   return (
     <div className="profile-container">
       <h2 className="profile-title">My Profile</h2>
@@ -22,6 +23,9 @@ export default function ProfilePage() {
         </button>
         <button className="profile-btn">
           <AiOutlineMessage className="icon" /> Support
+        </button>
+        <button className="profile-btn" onClick={() => (window.location.href = "http://localhost:5173/")}>
+        <AiOutlineArrowLeft className="icon" /> Back
         </button>
         <button className="profile-btn logout">
           <AiOutlineLogout className="icon" /> Logout

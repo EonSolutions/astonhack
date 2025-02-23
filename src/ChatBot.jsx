@@ -37,7 +37,7 @@ export default function ChatBotPage() {
   useEffect(() => {
     (async () => {
       const [items, _] = await getAllCategories();
-      setWardrobe(items.map(({ id, description }) => [id, description]));
+      setWardrobe(items.map(({ id, name }) => [id, name]));
     })();
   }, []);
 
@@ -88,7 +88,7 @@ export default function ChatBotPage() {
           const data = await response.json();
           const recommendation = data.recommendation;
           let r = data.response;
-          if (recommendation.length > 0) {
+          if (recommendation && recommendation.length > 0) {
             const args = JSON.parse(recommendation[0].function.arguments);
             r ||= args.message;
             const recommended_items = args.recommendation;

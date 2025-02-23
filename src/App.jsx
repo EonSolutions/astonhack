@@ -87,18 +87,27 @@ export default function App() {
       onClose(); // Close the modal
     };
 
+    console.log(addedItems);
+
     return (
-      <div className="popup-overlay" onClick={handleClose}>
+      <div className="popup-overlay">
         <div className="popup-content" onClick={(e) => e.stopPropagation()}>
           <h3>Items Added Successfully!</h3>
-          <ul>
+          <ul className="outfit-list">
             {addedItems.map((item) => (
-              <li key={item.id}>
-                <strong>{item.name}</strong> - {item.description}
-              </li>
+              <div key={item.id} className="outfit-item">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="outfit-image"
+                />
+                <div className="outfit-info">
+                  <h3>{item.name}</h3>{" "}
+                  <p>{item.description}</p>
+                </div>
+              </div>
             ))}
           </ul>
-          {/* Move the Close button here */}
           <button className="close-btn" onClick={handleClose}>
             Close
           </button>
@@ -169,15 +178,33 @@ export default function App() {
           const flaskData = await flaskResponse.json();
           console.log("✅ Flask Response:", flaskData);
 
+          // Wait 100ms
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
+          const [allItems, allCategories] = await getAllCategories();
+
+          setItems(allItems);
+          setCategories(allCategories);
+          setSelectedCategory(allCategories[0] || "");
+          setLoading(false); // Data fetching is complete
+
+          if (flaskData.type === "success") {
+            setAddedItems(
+              flaskData.results.map((i) =>
+                allItems.find((c) => c.id === i.itemid)
+              )
+            );
+          }
+
           // Show success message
           setShowSuccess(true);
           setShowPopup(false);
-          setTimeout(() => {
-            setShowSuccess(false);
-            window.location.reload();
-          }, 15000); // Refresh after animation ends
+          setShowAddedItemsModal(true);
 
-          alert("✅ Photo uploaded and processed successfully!");
+          // setTimeout(() => {
+          //   setShowSuccess(false);
+          //   window.location.reload();
+          // }, 1500); // Refresh after animation ends
         } else {
           console.error("❌ Error uploading to imgBB:", imgBBData);
         }
@@ -253,10 +280,14 @@ export default function App() {
         // Immediately show the loading component
         setIsProcessing(true);
 
+        if (flaskData.type === "success") {
+          setAddedItems(flaskData.results);
+        }
+
         // Refresh the page after a short delay
         setTimeout(() => {
           window.location.reload();
-        }, 100); // Small delay to ensure the loading component is visible
+        }, 10000); // Small delay to ensure the loading component is visible
       } else {
         console.error("❌ Error uploading to imgBB:", imgBBData);
       }
