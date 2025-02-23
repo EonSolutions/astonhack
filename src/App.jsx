@@ -93,14 +93,21 @@ export default function App() {
       <div className="popup-overlay">
         <div className="popup-content" onClick={(e) => e.stopPropagation()}>
           <h3>Items Added Successfully!</h3>
-          <ul>
+          <ul className="outfit-list">
             {addedItems.map((item) => (
-              <li key={item.id}>
-                <strong>{item.name}</strong> - {item.description}
-              </li>
+              <div key={item.id} className="outfit-item">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="outfit-image"
+                />
+                <div className="outfit-info">
+                  <h3>{item.name}</h3>{" "}
+                  <p>{item.description}</p>
+                </div>
+              </div>
             ))}
           </ul>
-          {/* Move the Close button here */}
           <button className="close-btn" onClick={handleClose}>
             Close
           </button>
