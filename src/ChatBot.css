@@ -211,3 +211,27 @@
     transform: translateY(-5px);
   }
 }
+
+.outfit-item {
+  display: flex;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 12px;
+  transition: all 0.3s ease-in-out;
+  margin-top: 10px;
+  
+}
+
+.outfit-item:hover {
+  background: #ddd;
+}
+
+/* Outfit Image */
+.outfit-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-right: 12px;
+}  

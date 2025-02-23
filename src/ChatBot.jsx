@@ -18,7 +18,7 @@ export default function ChatBotPage() {
     "Need outfit inspiration?",
     "Want to style your wardrobe?",
     "Looking for fashion advice?",
-    "Ask me anything about your wardrobe!"
+    "Ask me anything about your wardrobe!",
   ];
 
   // New prompts after the user sends a message
@@ -27,7 +27,7 @@ export default function ChatBotPage() {
     "Inspired yet? Ask me anything!",
     "Your wardrobe is looking amazing!",
     "Let’s find the perfect fit for you!",
-    "I love helping with fashion tips!"
+    "I love helping with fashion tips!",
   ];
 
   const [currentPrompt, setCurrentPrompt] = useState(initialPrompts[0]);
@@ -57,8 +57,17 @@ export default function ChatBotPage() {
       setFade(false);
 
       setTimeout(() => {
-        const randomIndex = Math.floor(Math.random() * (userHasSentMessage ? postMessagePrompts.length : initialPrompts.length));
-        setCurrentPrompt(userHasSentMessage ? postMessagePrompts[randomIndex] : initialPrompts[randomIndex]);
+        const randomIndex = Math.floor(
+          Math.random() *
+            (userHasSentMessage
+              ? postMessagePrompts.length
+              : initialPrompts.length)
+        );
+        setCurrentPrompt(
+          userHasSentMessage
+            ? postMessagePrompts[randomIndex]
+            : initialPrompts[randomIndex]
+        );
         setFade(true);
       }, 500);
     }, 4000);
@@ -66,7 +75,9 @@ export default function ChatBotPage() {
     return () => clearInterval(interval);
   }, [userHasSentMessage]);
 
-  const wardrobeStr = wardrobe.map(([id, desc]) => `${id} | ${desc}`).join("\n");
+  const wardrobeStr = wardrobe
+    .map(([id, desc]) => `${id} | ${desc}`)
+    .join("\n");
 
   const handleSend = async () => {
     if (input.trim()) {
@@ -88,17 +99,27 @@ export default function ChatBotPage() {
           const data = await response.json();
           const recommendation = data.recommendation;
           let r = data.response;
+          let recommended_items = [];
           if (recommendation && recommendation.length > 0) {
             const args = JSON.parse(recommendation[0].function.arguments);
             r ||= args.message;
-            const recommended_items = args.recommendation;
-            console.log(recommended_items);
+            const [allItems, allCategories] = await getAllCategories();
+            recommended_items = args.recommendation.map((id) =>
+              allItems.find((item) => item.id === id)
+            );
           }
-          const botMessage = { text: r || "No response from bot.", sender: "bot" };
+          const botMessage = {
+            text: r || "No response from bot.",
+            sender: "bot",
+            suggestion: recommended_items,
+          };
           setMessages((prev) => [...prev, botMessage]);
         } catch (error) {
           console.error("Error fetching bot response:", error);
-          setMessages((prev) => [...prev, { text: "Error connecting to the bot.", sender: "bot" }]);
+          setMessages((prev) => [
+            ...prev,
+            { text: "Error connecting to the bot.", sender: "bot" },
+          ]);
         } finally {
           setLoading(false);
         }
@@ -126,17 +147,49 @@ export default function ChatBotPage() {
       </div>
       <div className="chatbot-messages">
         {messages.map((message, index) => (
-          <div key={index} className={`chatbot-message ${message.sender === "user" ? "user-message" : "bot-message"}`}>
+          <div
+            key={index}
+            className={`chatbot-message ${
+              message.sender === "user" ? "user-message" : "bot-message"
+            }`}
+          >
             {message.text}
+            {message.suggestion && (
+              <ul className="outfit-list">
+                {message.suggestion.map((item) => (
+                  <div key={item.id} className="outfit-item">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="outfit-image"
+                    />
+                    <div className="outfit-info">
+                      <h3>{item.name}</h3> <p>{item.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </ul>
+            )}
           </div>
         ))}
-        {loading && <div className="bot-typing">
-          <span></span><span></span><span></span>
-        </div>}
+        {loading && (
+          <div className="bot-typing">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
       <div className="chatbot-input">
-        <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={handleKeyPress} placeholder="Type a message..." disabled={loading} />
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyPress={handleKeyPress}
+          placeholder="Type a message..."
+          disabled={loading}
+        />
         <button onClick={handleSend} disabled={loading}>
           <FaPaperPlane />
         </button>
