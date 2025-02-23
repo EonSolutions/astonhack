@@ -18,24 +18,6 @@ The AI model suggests outfits based on your wardrobe, factoring in usage history
 
 Our thrift store feature enables second-hand retailers to list available inventory, making it easy for users to explore, compare, and shortlist items. Combined with AI-powered recommendations, Re:Style ensures users can make eco-conscious fashion choices with just a tap.
 
-## Installation
-
-Clone the repository:
-
-git clone https://github.com/YourRepo/Re-Style.git
-
-Navigate to the project folder:
-
-cd re-style
-
-Install dependencies:
-
-npm install
-
-Run the application:
-
-npm run dev
-
 ## Demo Usage
 
 The demo provided allows users to upload a dataset of their wardrobe, interact with the AI assistant, and browse thrift store options. Follow these steps to test:
