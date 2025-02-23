@@ -202,21 +202,12 @@ h3 {
   overflow: hidden;
 }
 
-/* 🔹 Image Styling */
-.item-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Ensure proper scaling */
-  border-radius: 8px;
-  background-color: transparent;
-}
-
 /* 🔹 Title Styling */
 .item-title {
   font-size: 16px;
   font-weight: bold;
   color: black;
-  margin-top: 8px;
+  margin-top: 20px;
   text-transform: uppercase;
 }
 
@@ -237,17 +228,28 @@ h3 {
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Image container to ensure uniformity */
+/* 🔹 Image Container */
 .item-image-container {
-  width: 180px;
-  height: 200px;
+  min-width: 180px; /* Fixed width to ensure uniformity */
+  min-height: 200px; /* Fixed height */
+  max-width: 180px; /* Fixed width to ensure uniformity */
+  max-height: 200px; /* Fixed height */
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(to top, #222 10%, #444 90%);
   border-radius: 12px;
-  overflow: hidden;
+  overflow: hidden; /* Ensures that any image overflow is hidden */
 }
+
+/* 🔹 Image Styling */
+.item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image fills the container and crops if needed */
+  background-color: transparent;
+}
+
 
 h3 {
   font-size: 18px;
