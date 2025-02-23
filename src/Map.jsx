@@ -11,6 +11,7 @@ import { FiClock } from "react-icons/fi";
 import { FaRegStar } from "react-icons/fa";
 import "./Map.css"; // Import the CSS file for styling
 import BottomNavbar from "./BottomNavbar";
+import { IoLocationOutline } from "react-icons/io5";
 
 const MapView = () => {
   const [position, setPosition] = useState([
@@ -62,7 +63,7 @@ const MapView = () => {
   return (
     <>
       <header className="wardrobe-header">Sell My Clothes</header>
-      <BottomNavbar hasMiddle={false} setShowPopup={undefined}/>
+      <BottomNavbar hasMiddle={false} setShowPopup={undefined} />
       <div
         className="map-container"
         style={{
@@ -93,6 +94,10 @@ const MapView = () => {
               )}
               <div className="shop-info">
                 <h3>{shop.name}</h3>
+                <p>
+                  <IoLocationOutline style={{ marginRight: "4px" }} />
+                  {shop.vicinity || "Address not available"}
+                </p>
                 <p>
                   <FiClock style={{ marginRight: "4px" }} />
                   {shop.opening_hours ? (
@@ -174,6 +179,10 @@ const MapView = () => {
                     <div style={{ marginBottom: "4px", maxWidth: "200px" }}>
                       <strong>{shop.name}</strong>
                     </div>
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      <IoLocationOutline style={{ marginRight: "4px" }} />
+                      {shop.vicinity || "Address not available"}
+                    </span>
                     <span style={{ display: "flex", alignItems: "center" }}>
                       <FiClock style={{ marginRight: "4px" }} />
                       {shop.opening_hours ? (

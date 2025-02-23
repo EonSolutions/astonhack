@@ -3,13 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { AiOutlineCalendar } from "react-icons/ai";
 import { db } from "./lib/firebase";
-import {
-  getDocs,
-  query,
-  collection,
-  orderBy
-} from "firebase/firestore";
+import { getDocs, query, collection, orderBy } from "firebase/firestore";
 import "./HistoryCard.css";
+import { FaTriangleExclamation } from "react-icons/fa6";
 
 export default function HistoryCard() {
   const [outfitHistory, setOutfitHistory] = useState([]);
@@ -37,7 +33,10 @@ export default function HistoryCard() {
         // Fetch documents from each collection
         const outfitPromises = collectionNames.map(async (colName) => {
           console.log(`📂 Fetching from collection: ${colName}`);
-          const outfitQuery = query(collection(db, colName), orderBy("date", "desc"));
+          const outfitQuery = query(
+            collection(db, colName),
+            orderBy("date", "asc")
+          );
           const querySnapshot = await getDocs(outfitQuery);
 
           // Convert each doc to a JS object
@@ -53,7 +52,7 @@ export default function HistoryCard() {
         allOutfits = (await Promise.all(outfitPromises)).flat();
 
         // Sort the combined array by date (newest first)
-        allOutfits.sort((a, b) => b.date - a.date);
+        allOutfits.sort((a, b) => a.date - b.date);
 
         console.log("✅ Final sorted outfit history:", allOutfits);
         setOutfitHistory(allOutfits);
@@ -67,20 +66,45 @@ export default function HistoryCard() {
 
   return (
     <div className="history-card">
-      <h3 className="card-title">📅 Outfit History</h3>
+      <h3 className="card-title">📅 Old Wardrobe</h3>
       <div className="outfit-history">
         {outfitHistory.length > 0 ? (
           outfitHistory.map((entry) => (
-            <div key={entry.id} className="outfit-item">
-              <img src={entry.image} alt={entry.name} className="outfit-image" />
+            <div
+              key={entry.id}
+              className={`outfit-item ${
+                new Date() - entry.date > 31556952000 ? "bad" : ""
+              }`}
+            >
+              <img
+                src={entry.image}
+                alt={entry.name}
+                className="outfit-image"
+              />
               <div className="outfit-info">
                 <h3>{entry.name}</h3>
                 <p className="date-info">
                   <AiOutlineCalendar className="icon" />
                   {entry.date.toLocaleDateString()}
                 </p>
-
               </div>
+              <button
+                className={`expired-button ${
+                  new Date() - entry.date > 31556952000 ? "bad" : ""
+                }`}
+                onClick={() => {
+                  window.location.href = "/map";
+                }}
+              >
+                {new Date() - entry.date > 31556952000 ? (
+                  <>
+                    <FaTriangleExclamation style={{ marginRight: "4px" }} />{" "}
+                    Donate Now
+                  </>
+                ) : (
+                  <>Donate</>
+                )}
+              </button>
             </div>
           ))
         ) : (

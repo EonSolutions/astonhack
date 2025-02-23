@@ -6,10 +6,8 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
-import { Link } from "react-router-dom";
 import OutfitHistoryCard from "./HistoryCard";
 import OutfitChartCard from "./ChartCard";
-import ExtraCard from "./ExtraCard";
 import BottomNavbar from "./BottomNavbar"; // Import the BottomNavbar component
 import "./Dashboard.css";
 
@@ -46,7 +44,7 @@ export default function Dashboard() {
 
           const clothesQuery = query(
             collection(db, category),
-            orderBy("date", "desc")
+            orderBy("date", "asc")
           );
           const querySnapshot = await getDocs(clothesQuery);
 
@@ -87,22 +85,21 @@ export default function Dashboard() {
 
   return (
     <div>
-  <div className="dashboard-container">
-    {/* Left Side - Outfit History */}
-    <div className="left-column">
-      <OutfitHistoryCard outfitHistory={outfitHistory} />
+      <header className="wardrobe-header">Give Back</header>
+      <div className="dashboard-container">
+        {/* Left Side - Outfit History */}
+        <div className="left-column">
+          <OutfitHistoryCard outfitHistory={outfitHistory} />
+        </div>
+
+        {/* Right Side - Pie Chart (Top) & Extra Info (Bottom) */}
+        <div className="right-column">
+          <OutfitChartCard categoryData={categoryData} />
+        </div>
+      </div>
+
+      {/* 🔹 Ensure the shirt button is always visible by setting hasMiddle to false */}
+      <BottomNavbar hasMiddle={false} />
     </div>
-
-    {/* Right Side - Pie Chart (Top) & Extra Info (Bottom) */}
-    <div className="right-column">
-      <OutfitChartCard categoryData={categoryData} />
-      <ExtraCard />
-    </div>
-  </div>
-
-  {/* 🔹 Ensure the shirt button is always visible by setting hasMiddle to false */}
-  <BottomNavbar hasMiddle={false} />
-</div>
-
   );
 }

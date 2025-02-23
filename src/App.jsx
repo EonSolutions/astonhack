@@ -1,21 +1,13 @@
 import { useState, useEffect, useRef } from "react";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { collection, addDoc } from "firebase/firestore";
-import {
-  AiOutlineHome,
-  AiOutlinePlus,
-  AiOutlineUser,
-  AiOutlineMessage,
-  AiOutlineCloudUpload,
-  AiOutlineCamera,
-  AiOutlineBarChart,
-} from "react-icons/ai";
+import { AiOutlineCloudUpload, AiOutlineCamera } from "react-icons/ai";
 import { db } from "./lib/firebase";
 import Profile from "./Profile";
 import Dashboard from "./Dashboard";
 import "./App.css";
 import ChatBotPage from "./ChatBot";
-import { fetchCollections, getAllCategories } from "./lib/categories";
+import { getAllCategories } from "./lib/categories";
 import MapPage from "./Map";
 import BottomNavbar from "./BottomNavbar";
 
@@ -46,13 +38,6 @@ export default function App() {
       setShowAddedItemsModal(true);
     }
   }, []);
-
-  const toggleDescription = (itemId) => {
-    setExpandedDescriptions((prevState) => ({
-      ...prevState,
-      [itemId]: !prevState[itemId], // Toggle state for each item
-    }));
-  };
 
   const handleOpenCamera = async () => {
     console.log("Attempting to open camera...");
@@ -340,11 +325,6 @@ export default function App() {
       setShowAddedItemsModal(true);
     }
   }, [addedItems]);
-
-  const closeAddedItemsModal = () => {
-    setShowAddedItemsModal(false);
-    setAddedItems([]); // Clear the added items
-  };
 
   useEffect(() => {
     const fetchAllCollections = async () => {

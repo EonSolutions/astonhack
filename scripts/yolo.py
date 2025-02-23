@@ -6,7 +6,7 @@ import requests
 # Load the YOLOv8 segmentation model
 model = YOLO('deepfashion2_yolov8s-seg.pt')
 
-def yolo(image_path_or_url, min_width=50, min_height=50):
+def yolo(image_path_or_url, min_width=75, min_height=75):
     # Check if the input is a URL
     if image_path_or_url.startswith('http://') or image_path_or_url.startswith('https://'):
         # Download the image from the URL
