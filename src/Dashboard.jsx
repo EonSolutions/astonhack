@@ -13,6 +13,7 @@ export default function Dashboard() {
     const fetchAllCollections = async () => {
       const db = getFirestore();
       let allItems = [];
+      let categoryCount = {}; //new
 
       // 🔹 List of collections from your Firestore
       const collections = [
@@ -39,6 +40,8 @@ export default function Dashboard() {
           const clothesQuery = query(collection(db, category), orderBy("date", "desc"));
           const querySnapshot = await getDocs(clothesQuery);
 
+          categoryCount[category] = (categoryCount[category] || 0) + querySnapshot.size; //new
+
           // 🔹 Extract document data
           const collectionItems = querySnapshot.docs.map((doc) => ({
             id: doc.id,
@@ -55,9 +58,16 @@ export default function Dashboard() {
         // 🔹 Sort by date (newest first) and get the top 5 outfits
         allItems.sort((a, b) => b.date - a.date);
         const top5NewOutfits = allItems.slice(0, 5);
-
         console.log("🔥 Top 5 newest worn clothes:", top5NewOutfits);
         setOutfitHistory(top5NewOutfits);
+
+        const formattedCategoryData = Object.keys(categoryCount).map((key) => ({
+          name: key.replace(/_/g, " "), // Format category names for display
+          value: categoryCount[key],
+        }));
+
+        console.log("📊 Outfit Category Breakdown:", formattedCategoryData);
+        setCategoryData(formattedCategoryData);
 
       } catch (error) {
         console.error("❌ Error fetching collections:", error);
