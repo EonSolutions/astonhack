@@ -60,8 +60,8 @@ const BottomNavbar = ({ hasMiddle, setShowPopup }) => {
       <AnimatePresence>
         {animateCircle && (
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 100 }}
+            initial={{ scale: 0, backgroundColor: "#ffffff"  }}
+            animate={{ scale: 100, backgroundColor: "#f8f8f8" }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease: "easeIn" }}
             style={{
@@ -70,7 +70,7 @@ const BottomNavbar = ({ hasMiddle, setShowPopup }) => {
               left: "50%",
               width: 30,
               height: 30,
-              backgroundColor: "#f8f8f8", // White color for the wipe
+               // White color for the wipe
               borderRadius: "50%",
               transform: "translate(-50%, -50%)",
               pointerEvents: "none",
