@@ -8,6 +8,7 @@ import Dashboard from "./Dashboard";
 import "./App.css";
 import ChatBotPage from "./ChatBot";
 import { fetchCollections, getAllCategories } from "./lib/categories";
+import MapPage from "./Map";
 
 
 export default function App() {
@@ -449,6 +450,7 @@ export default function App() {
             </div>
           }
         />
+        <Route path="/map" element={<MapPage />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/chat" element={<ChatBotPage />} />
