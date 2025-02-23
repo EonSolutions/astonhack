@@ -1,91 +1,69 @@
-# React + Vite
+# Welcome to Re:Style!
 
-## E-Wardrobe: AI-Powered Digital Closet & Fashion Assistant
+Re:Style is an innovative, AI-powered platform designed to digitise your wardrobe, provide smart outfit recommendations, and promote sustainable fashion choices through AI-powered thrift store integration and fashion analytics.
 
-# Overview
+## Key Features:
 
-E-Wardrobe is an innovative, AI-powered digital wardrobe designed to revolutionize the way users manage their clothing and explore fashion. Through advanced photo recognition technology, E-Wardrobe allows users to take pictures of their outfits, accurately identifying individual clothing items and categorizing them within a personal, digital wardrobe. This platform not only provides a seamless and intelligent way to organize clothing but also delivers valuable insights into personal fashion habits and sustainable shopping options.
+- AI-Powered Clothing Recognition – Instantly detects and categorises clothing from uploaded images.
+- Digital Wardrobe Management – Easily browse and organise your clothes.
+- Outfit Reuse Tracking – See your most and least worn outfits.
+- AI Fashion Assistant – Get real-time outfit recommendations based on weather, occasion, and your existing wardrobe.
+- Thrift Store Integration – Discover and shortlist sustainable fashion options from local thrift stores.
 
-# Features
+## How Does Re:Style Work?
 
-**📸 AI-Powered Clothing Recognition**
+Re:Style allows users to upload images of their clothing, which are then processed using AI to identify and categorise each piece into a digital wardrobe.
 
-Users can upload photos of their outfits, and the AI will analyze and categorize each clothing item automatically.
+The AI model suggests outfits based on your wardrobe, factoring in usage history, personal style, and environmental conditions. To promote sustainability, users can track clothing usage, swap underused items, and explore second-hand fashion through integrated thrift store listings.
 
-High accuracy in detecting clothing types, such as shirts, dresses, jackets, pants, and accessories.
+Our thrift store feature enables second-hand retailers to list available inventory, making it easy for users to explore, compare, and shortlist items. Combined with AI-powered recommendations, Re:Style ensures users can make eco-conscious fashion choices with just a tap.
 
-Seamless integration into the user’s digital wardrobe, reducing the need for manual input.
+## Installation
 
-**👗 Interactive Digital Wardrobe**
+Clone the repository:
 
-A visually appealing and structured inventory of all clothing items.
+git clone https://github.com/YourRepo/Re-Style.git
 
-Easy navigation through categories (e.g., tops, bottoms, outerwear, accessories).
+Navigate to the project folder:
 
-Users can track what they have worn recently and monitor their style preferences.
+cd re-style
 
-**📊 Wardrobe Statistics & Insights**
+Install dependencies:
 
-Users receive data-driven insights about their wardrobe.
+npm install
 
-Breakdown of clothing categories with visual statistics.
+Run the application:
 
-Tracking of most and least worn items, helping users make informed decisions about outfit choices.
+npm run dev
 
-**🛍 Sustainable Shopping with Local Thrift Store Locator**
+## Demo Usage
 
-Built-in map feature to locate nearby thrift stores.
+The demo provided allows users to upload a dataset of their wardrobe, interact with the AI assistant, and browse thrift store options. Follow these steps to test:
 
-Encourages sustainable fashion choices by promoting second-hand shopping.
+1. Run the app
+2. Start taking photos of yourself as you are dressed for the day.
+3. Navigate easliy as AI registers and categorises the outfits.
+![alt text](./readme_images/UI.png)
+4. Interact with the AI assistant to receive outfit recommendations.
+![alt text](./readme_images/AI_Chat.png)
+5. Refer to the Give Back section where you get notified on some of your unused items
+![alt text](./readme_images/Giveback.png)
+6. If you decide to click Donate, have acess to the
+![alt text](./readme_images/Map.png)
 
-Reduces unnecessary consumption by helping users see what they already own.
+## Experience with AI & Sustainability
 
-**🧠 AI Fashion Assistant**
+Building Re:Style has been an exciting journey. We leveraged AI-powered image recognition and data analytics to help users make better fashion decisions while supporting sustainable shopping practices.
 
-A conversational AI chatbot provides fashion advice based on wardrobe contents.
+Although implementing AI-driven clothing recognition and thrift store integrations posed challenges, our experience with machine learning, data processing, and sustainable fashion technologies has been incredibly rewarding.
 
-AI-generated outfit recommendations tailored to personal style.
+Thank you for the opportunity to explore the intersection of fashion, AI, and sustainability!
 
-Smart suggestions based on weather, occasion, and user preferences.
+## Contact
 
-**How It Works**
+👤 Kerem Uygun – keremuygun86@gmail.com
+👤 Tom Shtaseo – veschi@gmail.com
+👤 Wilbert Tham – wilbertthxm@gmail.com
+👤 Harry Day – hdkeyworth@gmail.com
 
-Upload a photo of your outfit.
 
-AI recognizes and categorizes clothing items into your digital wardrobe.
-
-Explore and navigate through your wardrobe with ease.
-
-View wardrobe statistics and keep track of your most worn items.
-
-Get AI-powered fashion advice and outfit recommendations.
-
-Find sustainable shopping options via the integrated thrift store map.
-
-**Why E-Wardrobe?**
-
-Convenience: No more forgetting what you own—your wardrobe is digitized.
-
-Sustainability: Encourages mindful fashion choices by highlighting local thrift stores.
-
-Personalized AI Fashion Tips: Style advice tailored to your unique wardrobe.
-
-Data-Driven Insights: Gain valuable statistics about clothing usage.
-
-Seamless Navigation: Explore and manage your wardrobe effortlessly.
-
-**Future Enhancements**
-
-Weather-based outfit suggestions.
-
-Social sharing features to showcase outfits and inspire friends.
-
-Integration with online thrift stores for seamless second-hand shopping.
-
-Personalized fashion trends analysis using AI.
-
-Conclusion
-
-E-Wardrobe is not just a virtual closet—it is a smart wardrobe assistant that combines AI-driven technology with sustainable fashion practices. Whether you need clothing organization, fashion advice, or thrift shopping recommendations, E-Wardrobe ensures that your style is efficient, stylish, and eco-conscious.
-
-Join the fashion-tech revolution and redefine how you interact with your wardrobe today! 🚀
