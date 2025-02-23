@@ -131,7 +131,7 @@ def process_image():
                 options = [doc['description'] for doc in docs]
                 probsarray = blip.image_blip(image, options)
                 max_index = np.argmax(probsarray)
-                if probsarray[max_index] > 0.85:
+                if probsarray[max_index] > 0.90:
                     results.append({
                         "type": "found",
                         "itemid": docs[max_index]['id']
