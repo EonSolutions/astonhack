@@ -47,7 +47,14 @@ export default function ChatBotPage() {
         });
 
         const data = await response.json();
-        const botMessage = { text: data.response || "No response from bot.", sender: "bot" };
+        const recommendation = data.recommendation;
+        let r = data.response;
+        if (recommendation.length > 0) {
+            const args = JSON.parse(recommendation[0].function.arguments);
+            r ||= args.message
+            const recommended_items = args.recommendation
+        }
+        const botMessage = { text: r || "No response from bot.", sender: "bot" };
         setMessages((prev) => [...prev, botMessage]);
       } catch (error) {
         console.error("Error fetching bot response:", error);
