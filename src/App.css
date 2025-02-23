@@ -230,6 +230,7 @@ p {
   justify-content: center;
   align-items: center;
   animation: fadeIn 0.3s ease-in-out;
+  z-index: 20;
 }
 
 /* Fade out effect when closing */
