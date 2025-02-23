@@ -407,7 +407,7 @@ export default function App() {
 
                               <h3 className="item-title">{item.name}</h3>
 
-                              <div className="item-description">
+                              {/* <div className="item-description">
                                 {item.description.split(" ").length > 10 ? (
                                   <div>
                                     {!expandedDescriptions[item.id] ? (
@@ -434,7 +434,7 @@ export default function App() {
                                 ) : (
                                   <p>{item.description}</p>
                                 )}
-                              </div>
+                              </div> */}
                             </div>
                           ))}
                       </div>
