@@ -139,32 +139,28 @@ export default function App() {
           console.log("✅ Image uploaded to imgBB:", imageUrl);
 
           // Store the image URL in Firestore
-          const newItem = {
-            id: new Date().getTime().toString(), // Generate a unique ID
-            name: "New Outfit", // Default name
-            description: "Added via photo upload", // Default description
-            image: imageUrl,
-          };
-
-          await addDoc(collection(db, "shirts"), newItem);
+          await addDoc(collection(db, "shirts"), { image: imageUrl });
           console.log("✅ Photo URL saved to Firestore database.");
 
-          // Save the added item to localStorage
-          const existingItems = JSON.parse(localStorage.getItem("addedItems")) || [];
-          const updatedItems = [...existingItems, newItem];
-          localStorage.setItem("addedItems", JSON.stringify(updatedItems));
+          // Send image to Flask for processing
+          const flaskResponse = await fetch("http://127.0.0.1:5000/process_image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image_url: imageUrl })
+          });
+
+          const flaskData = await flaskResponse.json();
+          console.log("✅ Flask Response:", flaskData);
 
           // Show success message
           setShowSuccess(true);
           setShowPopup(false);
-
-          // Immediately show the loading component
-          setIsProcessing(true);
-
-          // Refresh the page after a short delay
           setTimeout(() => {
-            window.location.reload();
-          }, 100); // Small delay to ensure the loading component is visible
+            setShowSuccess(false);
+            window.location.reload(); 
+          }, 15000); // Refresh after animation ends
+
+          alert("✅ Photo uploaded and processed successfully!");
         } else {
           console.error("❌ Error uploading to imgBB:", imgBBData);
         }
@@ -237,7 +233,7 @@ export default function App() {
         // Refresh the page after a short delay
         setTimeout(() => {
           window.location.reload();
-        }, 100); // Small delay to ensure the loading component is visible
+        }, 10000); // Small delay to ensure the loading component is visible
       } else {
         console.error("❌ Error uploading to imgBB:", imgBBData);
       }
