@@ -8,9 +8,6 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-const GOOGLE_API_URL =
-  "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
-
 const MapView = () => {
   const [position, setPosition] = useState([
     52.48699397560638, -1.8902491470592893,
