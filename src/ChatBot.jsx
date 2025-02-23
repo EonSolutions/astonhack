@@ -1,41 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./ChatBot.css";
 import { getAllCategories } from "./lib/categories";
+import { FaPaperPlane } from "react-icons/fa";
 
 export default function ChatBotPage() {
   const [wardrobe, setWardrobe] = useState([]);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     (async () => {
       const [items, _] = await getAllCategories();
-
-      // Create a wardrobe array with the item ID and description
       const wardrobe = items.map(({ id, description }) => [id, description]);
       setWardrobe(wardrobe);
     })();
   }, []);
 
-  //   On page load, post RESET
   useEffect(() => {
     (async () => {
       await fetch("http://localhost:5000/reset", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({}),
       });
     })();
   }, []);
 
-  const wardrobeStr = wardrobe
-    .map(([id, desc]) => `${id} | ${desc}`)
-    .join("\n");
-  //   console.log(wardrobeStr);
+  const wardrobeStr = wardrobe.map(([id, desc]) => `${id} | ${desc}`).join("\n");
 
   const handleSend = async () => {
     if (input.trim()) {
@@ -47,29 +41,17 @@ export default function ChatBotPage() {
       try {
         const response = await fetch("http://localhost:5000/chat", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({
-            message: input,
-            wardrobe: wardrobeStr,
-          }),
+          body: JSON.stringify({ message: input, wardrobe: wardrobeStr }),
         });
 
         const data = await response.json();
-        console.log(data);
-        const botMessage = {
-          text: data.response || "No response from bot.",
-          sender: "bot",
-        };
+        const botMessage = { text: data.response || "No response from bot.", sender: "bot" };
         setMessages((prev) => [...prev, botMessage]);
       } catch (error) {
         console.error("Error fetching bot response:", error);
-        setMessages((prev) => [
-          ...prev,
-          { text: "Error connecting to the bot.", sender: "bot" },
-        ]);
+        setMessages((prev) => [...prev, { text: "Error connecting to the bot.", sender: "bot" }]);
       } finally {
         setLoading(false);
       }
@@ -77,25 +59,26 @@ export default function ChatBotPage() {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !loading) {
-      handleSend();
-    }
+    if (e.key === "Enter" && !loading) handleSend();
   };
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
     <div className="chatbot-container">
+      <div className="chatbot-header">
+        <h2>AI Stylist</h2>
+      </div>
       <div className="chatbot-messages">
         {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`chatbot-message ${
-              message.sender === "user" ? "user-message" : "bot-message"
-            }`}
-          >
+          <div key={index} className={`chatbot-message ${message.sender === "user" ? "user-message" : "bot-message"}`}>
             {message.text}
           </div>
         ))}
         {loading && <div className="bot-message">Bot is typing...</div>}
+        <div ref={messagesEndRef} />
       </div>
       <div className="chatbot-input">
         <input
@@ -107,7 +90,7 @@ export default function ChatBotPage() {
           disabled={loading}
         />
         <button onClick={handleSend} disabled={loading}>
-          {loading ? "Sending..." : "Send"}
+          <FaPaperPlane />
         </button>
       </div>
     </div>
