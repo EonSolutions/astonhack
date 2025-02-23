@@ -75,10 +75,11 @@ export default function HistoryCard() {
               <img src={entry.image} alt={entry.name} className="outfit-image" />
               <div className="outfit-info">
                 <h3>{entry.name}</h3>
-                <p>
-                  <AiOutlineCalendar className="icon" />{" "}
+                <p className="date-info">
+                  <AiOutlineCalendar className="icon" />
                   {entry.date.toLocaleDateString()}
                 </p>
+
               </div>
             </div>
           ))
