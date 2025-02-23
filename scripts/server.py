@@ -47,6 +47,8 @@ import yolo
 import clip
 import feat
 
+GOOGLE_API_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+
 @app.route('/process_image', methods=['POST'])
 def process_image():
     data = request.get_json()
@@ -106,6 +108,27 @@ def process_image():
         return jsonify({'type': "success", 'results': results}), 200
     except Exception as e:
         return jsonify({'type': "fail", 'error': str(e)}), 500
+
+@app.route('/get-charity-shops', methods=['GET'])
+def get_charity_shops():
+    lat = request.args.get('lat')
+    lng = request.args.get('lng')
+
+    if not lat or not lng:
+        return jsonify({"error": "Latitude and Longitude are required"}), 400
+    
+    # Construct the URL for Google Places API
+    google_api_key = os.getenv("GOOGLE_API_KEY")  # You should set this in your environment or use dotenv
+    url = f"{GOOGLE_API_URL}?location={lat},{lng}&radius=5000&keyword=charity+shop&type=store&key={google_api_key}"
+
+    # Make the request to the Google Places API
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        return jsonify({"error": "Failed to fetch data from Google Places API"}), response.status_code
+
+    # Return the data as JSON
+    return jsonify(response.json())
 
 if __name__ == '__main__':
     app.run(debug=True)
