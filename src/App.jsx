@@ -242,7 +242,6 @@ export default function App() {
 
       if (imgBBData.success) {
         const imageUrl = imgBBData.data.url;
-        console.log("✅ Image uploaded to imgBB:", imageUrl);
 
         // Store the image URL in Firestore
         const newItem = {

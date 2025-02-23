@@ -8,6 +8,7 @@
   overflow: hidden;
 }
 
+
 /* Full-width Header with Gradient */
 .chatbot-header {
   display: flex;
@@ -16,11 +17,12 @@
   position: relative;
   background: linear-gradient(90deg, #a855f7, #d946ef);
   color: white;
-  padding: 16px;
+  padding: 35px;
   font-size: 1.5rem;
   font-weight: bold;
   text-transform: uppercase;
   min-height: 60px;
+  font-family: 'HorizonFont', sans-serif;
 }
 
 /* Animated Prompt Text */
@@ -55,6 +57,7 @@
   scrollbar-width: thin;
   scrollbar-color: #d946ef #ffffff;
   background: #f5f5f5;
+  font-family: 'Montserrat', sans-serif;
 }
 
 /* Chat Messages Styling */
@@ -67,6 +70,7 @@
   word-wrap: break-word;
   animation: fadeIn 0.2s ease-in-out;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-family: 'Montserrat', sans-serif;
 }
 
 .user-message {
@@ -74,6 +78,7 @@
   background: linear-gradient(90deg, #a855f7, #d946ef);
   color: white;
   border-bottom-right-radius: 6px;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .bot-message {
@@ -81,6 +86,7 @@
   background: #f3e8ff;
   color: #5b21b6;
   border-bottom-left-radius: 6px;
+  font-family: 'Montserrat', sans-serif;
 }
 
 /* Chat Input Section - Sticks to Bottom */
@@ -95,6 +101,7 @@
   bottom: 0;
   width: 100%;
   left: 0;
+  font-family: 'Montserrat', sans-serif;
 }
 
 /* Input Field */
@@ -108,15 +115,18 @@
   color: #333;
   font-size: 1rem;
   transition: 0.3s;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .chatbot-input input::placeholder {
   color: #999;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .chatbot-input input:focus {
   border-color: #b731c7;
   box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+  font-family: 'Montserrat', sans-serif;
 }
 
 /* Send Button */
