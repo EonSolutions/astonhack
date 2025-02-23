@@ -1,17 +1,18 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS  # 🔥 Import Flask-CORS
 import numpy as np
 import requests
 import base64
 import cv2
 import os
-
 import firebase_admin
 from firebase_admin import credentials, firestore
-
-# Load .ENV
 from dotenv import load_dotenv
+
+# Load environment variables
 load_dotenv()
 
+# Initialize Firebase
 cred = credentials.Certificate({
   "type": "service_account",
   "project_id": "astonhack-3a04f",
@@ -26,17 +27,18 @@ cred = credentials.Certificate({
   "universe_domain": "googleapis.com"
 })
 firebase_admin.initialize_app(cred)
-
 db = firestore.client()
+
+# Initialize Flask App
+app = Flask(__name__)
+CORS(app)  # 🔥 Enable CORS for all routes
 
 def upload_cv2_img_to_imgbb(cv2_image):
     _, buffer = cv2.imencode('.jpg', cv2_image)
     img_base64 = base64.b64encode(buffer).decode("utf-8")
 
     url = "https://api.imgbb.com/1/upload?key=" + os.getenv('IMGBB_KEY')
-    payload = {
-        "image": img_base64
-    }
+    payload = {"image": img_base64}
     res = requests.post(url, payload)
     print(res.json())
     return res.json()['data']['url']
@@ -44,9 +46,6 @@ def upload_cv2_img_to_imgbb(cv2_image):
 import yolo
 import clip
 import feat
-
-app = Flask(__name__)
-
 
 @app.route('/process_image', methods=['POST'])
 def process_image():
@@ -59,8 +58,7 @@ def process_image():
     try:
         # 1. Segmentation
         outputs = yolo.yolo(image_url)
-        
-        
+
         results = []
 
         # 2. CLIP
@@ -72,30 +70,26 @@ def process_image():
             
             # 2.1 Get from DB
             collection = db.collection(category)
-            docs = []
-            for doc in collection.stream():
-                d = doc.to_dict()
-                d['id'] = doc.id
-                docs.append(d)
+            docs = [doc.to_dict() | {'id': doc.id} for doc in collection.stream()]
                 
             if len(docs) != 0:
-                print("No docs found")
-        
+
                 # 2.2 Get probabilities
                 options = [doc['description'] for doc in docs]
                 probsarray = clip.image_clip(image, options)[0]
                 max_index = np.argmax(probsarray)
-                if probsarray[max_index] > 0.75:
+                if probsarray[max_index] > 0.85:
                     results.append({
                         "type": "found",
                         "itemid": docs[max_index]['id']
                     })
                     continue
             
-            print("WAP")
+            print("Uploading new item...")
+            
             # 3.1 Upload cv2 image to imgbb
             uploaded_image_url = upload_cv2_img_to_imgbb(image)
-            print("WOP")
+            print("Upload complete.")
         
             # 3.2 Add to collection
             doc_ref = collection.add({
@@ -104,16 +98,14 @@ def process_image():
                 'name': 'Unknown'
             })
             
-            
             results.append({
                 "type": "new",
-                "itemid": doc_ref[0]
+                "itemid": doc_ref[1].id
             })
                 
         return jsonify({'type': "success", 'results': results}), 200
     except Exception as e:
         return jsonify({'type': "fail", 'error': str(e)}), 500
-
 
 if __name__ == '__main__':
     app.run(debug=True)
