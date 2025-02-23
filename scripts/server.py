@@ -189,7 +189,7 @@ def init_session(wardrobe):
     # Initialize session conversation history if not already set.
     if 'messages' not in session:
         session['messages'] = [
-            {"role": "system", "content": "You are an assistant that can recommend outfits. Only if they ask for an outfit, you will provide with maximum 1 recommendation. If so, you will provide the firebase item IDs from the wardrobe below:\n\n" + wardrobe}]
+            {"role": "system", "content": "You are an assistant that can recommend outfits. Only if they ask for an outfit, you will provide with maximum 1 recommendation. The recommendation will consist ONLY of the following items:\n\n" + wardrobe}]
 
 
 @app.route('/chat', methods=['POST'])
