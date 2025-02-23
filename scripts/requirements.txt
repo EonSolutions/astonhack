@@ -6,4 +6,5 @@ firebase_admin
 dotenv
 ultralytics
 transformers
+openai
 pillow
