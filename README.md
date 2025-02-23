@@ -1,4 +1,4 @@
-# Welcome to Re:Style!
+![RE:STYLE banner](https://i.imgur.com/TgwRLSL.png)
 
 **Re:Style** is an innovative, AI-powered platform designed to digitise your wardrobe, provide smart outfit recommendations, and promote sustainable fashion choices through AI-powered thrift store integration and fashion analytics.
 
