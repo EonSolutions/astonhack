@@ -47,9 +47,20 @@ export default function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [addedItems, setAddedItems] = useState([]);
+const [showAddedItemsModal, setShowAddedItemsModal] = useState(false);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+
+  useEffect(() => {
+    // Check localStorage for added items on app load
+    const storedItems = JSON.parse(localStorage.getItem("addedItems"));
+    if (storedItems && storedItems.length > 0) {
+      setAddedItems(storedItems);
+      setShowAddedItemsModal(true);
+    }
+  }, []);
 
   const toggleDescription = (itemId) => {
     setExpandedDescriptions((prevState) => ({
@@ -85,69 +96,98 @@ export default function App() {
     }
   };
 
+  const AddedItemsModal = ({ addedItems, onClose }) => {
+    const handleClose = () => {
+      localStorage.removeItem("addedItems"); // Clear localStorage
+      onClose(); // Close the modal
+    };
+  
+    return (
+      <div className="popup-overlay" onClick={handleClose}>
+        <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+          <h3>Items Added Successfully!</h3>
+          <p>{addedItems.length} item(s) have been added!</p>
+          {/* <ul>
+            {addedItems.map((item) => (
+              <li key={item.id}>
+                <strong>{item.name}</strong> - {item.description}
+              </li>
+            ))}
+          </ul> */}
+          {/* Move the Close button here */}
+          <button className="close-btn" onClick={handleClose}>Close</button>
+        </div>
+      </div>
+    );
+  };
+
   const handleTakePhoto = () => {
     console.log("📸 Capturing photo...");
-
+  
     if (!videoRef.current || !canvasRef.current) {
       console.warn("⚠️ Video or Canvas element not found!");
       return;
     }
-
+  
     setIsProcessing(true); // Show loading animation
-
+  
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
     console.log("✅ Photo captured and drawn onto canvas.");
-
+  
     canvas.toBlob(async (blob) => {
       if (!blob) {
         console.warn("⚠️ Failed to capture photo as blob.");
         setIsProcessing(false);
         return;
       }
-
+  
       console.log("🔄 Uploading photo to imgBB...");
-
+  
       const formData = new FormData();
       formData.append("image", blob);
-
+  
       try {
         // Upload image to imgBB
         const imgBBResponse = await fetch(`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_KEY}`, {
           method: "POST",
           body: formData,
         });
-
+  
         const imgBBData = await imgBBResponse.json();
-
+  
         if (imgBBData.success) {
           const imageUrl = imgBBData.data.url;
           console.log("✅ Image uploaded to imgBB:", imageUrl);
-
+  
           // Store the image URL in Firestore
-          await addDoc(collection(db, "shirts"), { image: imageUrl });
+          const newItem = {
+            id: new Date().getTime().toString(), // Generate a unique ID
+            name: "New Outfit", // Default name
+            description: "Added via photo upload", // Default description
+            image: imageUrl,
+          };
+  
+          await addDoc(collection(db, "shirts"), newItem);
           console.log("✅ Photo URL saved to Firestore database.");
-
-          // Send image to Flask for processing
-          const flaskResponse = await fetch("http://127.0.0.1:5000/process_image", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image_url: imageUrl })
-          });
-
-          const flaskData = await flaskResponse.json();
-          console.log("✅ Flask Response:", flaskData);
-
+  
+          // Save the added item to localStorage
+          const existingItems = JSON.parse(localStorage.getItem("addedItems")) || [];
+          const updatedItems = [...existingItems, newItem];
+          localStorage.setItem("addedItems", JSON.stringify(updatedItems));
+  
           // Show success message
           setShowSuccess(true);
           setShowPopup(false);
+  
+          // Immediately show the loading component
+          setIsProcessing(true);
+  
+          // Refresh the page after a short delay
           setTimeout(() => {
-            setShowSuccess(false);
             window.location.reload();
-          }, 1500); // Refresh after animation ends
-
-          alert("✅ Photo uploaded and processed successfully!");
+          }, 100); // Small delay to ensure the loading component is visible
         } else {
           console.error("❌ Error uploading to imgBB:", imgBBData);
         }
@@ -158,7 +198,6 @@ export default function App() {
       }
     }, "image/jpeg");
   };
-
 
   const handleUploadPhoto = () => {
     const fileInput = document.createElement('input');
@@ -206,6 +245,17 @@ export default function App() {
       </div>
     </div>
   );
+
+  useEffect(() => {
+    if (addedItems.length > 0) {
+      setShowAddedItemsModal(true);
+    }
+  }, [addedItems]);
+  
+  const closeAddedItemsModal = () => {
+    setShowAddedItemsModal(false);
+    setAddedItems([]); // Clear the added items
+  };
 
   useEffect(() => {
     const fetchAllCollections = async () => {
@@ -256,12 +306,13 @@ export default function App() {
           path="/"
           element={
             <div className="wardrobe-container">
-              {loading ? (
-                <LoadingComponent />
-              ) : (
+              {/* Show loading component if processing or refreshing */}
+              {(loading || isProcessing) && <LoadingComponent />}
+  
+              {!loading && !isProcessing && (
                 <>
                   <header className="wardrobe-header">My Wardrobe</header>
-
+  
                   <div className="main-content">
                     <div className="category-buttons">
                       {categories.map((category) => (
@@ -274,7 +325,7 @@ export default function App() {
                         </button>
                       ))}
                     </div>
-
+  
                     {items.length > 0 ? (
                       <div className="item-grid">
                         {items
@@ -284,9 +335,9 @@ export default function App() {
                               <div className="item-image-container">
                                 <img src={item.image} alt={item.name} className="item-image" />
                               </div>
-
+  
                               <h3 className="item-title">{item.name}</h3>
-
+  
                               <div className="item-description">
                                 {item.description.split(" ").length > 10 ? (
                                   <div>
@@ -295,7 +346,7 @@ export default function App() {
                                     ) : (
                                       <p>{item.description}</p>
                                     )}
-
+  
                                     <button
                                       className="see-description-btn"
                                       onClick={() => toggleDescription(item.id)}
@@ -316,7 +367,7 @@ export default function App() {
                       </div>
                     )}
                   </div>
-
+  
                   <div className="bottom-navbar">
                     <button className="nav-btn"><AiOutlineHome size={30} /></button>
                     <button className="nav-btn"><AiOutlineMessage size={30} /></button>
@@ -324,7 +375,7 @@ export default function App() {
                     <Link to="/dashboard" className="nav-btn"><AiOutlineBarChart size={30} /></Link>
                     <Link to="/profile" className="nav-btn"><AiOutlineUser size={30} /></Link>
                   </div>
-
+  
                   {showPopup && (
                     <div className={`popup-overlay ${isUploadClosing ? "closing" : ""}`} onClick={closePopup}>
                       <div className={`popup-content ${isUploadClosing ? "closing" : ""}`} onClick={(e) => e.stopPropagation()}>
@@ -339,7 +390,7 @@ export default function App() {
                           <p className="upload-text">Drag & drop your files here or</p>
                           <button className="upload-btn">Choose files</button>
                         </div>
-
+  
                         {/* Take Photo Button */}
                         <button className="take-photo-btn" onClick={handleOpenCamera}>
                           <AiOutlineCamera className="camera-icon" /> Take a Photo
@@ -347,7 +398,7 @@ export default function App() {
                       </div>
                     </div>
                   )}
-
+  
                   {/* Camera Popup */}
                   {showCameraPopup && (
                     <div className="popup-overlay" onClick={() => setShowCameraPopup(false)}>
@@ -359,20 +410,9 @@ export default function App() {
                       </div>
                     </div>
                   )}
-
-                  {isProcessing && (
-                    <div className="loading-overlay">
-                      <div className="loading-container">
-                        <div className="loading-spinner"></div>
-                        <p className="loading-text">Processing image...</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {showSuccess && (
-                    <div className="success-toast">
-                      ✅ Your outfit has been added!
-                    </div>
+                  
+                  {showAddedItemsModal && (
+                    <AddedItemsModal addedItems={addedItems} onClose={() => setShowAddedItemsModal(false)} />
                   )}
                 </>
               )}

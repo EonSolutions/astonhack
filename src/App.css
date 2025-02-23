@@ -382,21 +382,20 @@ p {
   background: black;
 }
 
-/* Close Button - Make it Visible */
 .close-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: none;
+  background: #933ddd; /* Match your theme color */
+  color: white;
   border: none;
-  font-size: 20px;
+  padding: 10px 20px;
+  border-radius: 8px;
   cursor: pointer;
-  color: black; /* Change to a darker color for visibility */
-  transition: all 0.2s;
+  margin-top: 20px; /* Add space above the button */
+  font-size: 16px;
+  transition: background 0.3s ease-in-out;
 }
 
 .close-btn:hover {
-  color: red;
+  background: #7326b8; /* Darker shade for hover effect */
 }
 
 /* Animations */
