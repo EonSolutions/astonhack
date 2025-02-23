@@ -7,13 +7,21 @@ import Profile from "./Profile";
 import Dashboard from "./Dashboard";
 import "./App.css";
 
+const formatCategoryName = (category) => {
+  return category
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
 const fetchCollections = async () => {
   try {
     const snapshot = await getDocs(collection(db, "Collections")); // Replace with the actual collection name
     const dbCategories = snapshot.docs.map(doc => doc.id); // Extracts document IDs
 
-    console.log("Fetched Collections:", dbCategories);
-    return dbCategories;
+    const formattedCategories = dbCategories.map(formatCategoryName);
+
+    return formattedCategories;
   } catch (error) {
     console.error("Error fetching collections:", error);
     return [];
@@ -21,9 +29,10 @@ const fetchCollections = async () => {
 };
 
 // Call this function where needed (e.g., inside a React component)
-fetchCollections().then(dbCategories => {
-  console.log("Collections Array:", dbCategories);
+fetchCollections().then(formattedCategories => {
+  console.log("Collections Array:", formattedCategories);
 });
+
 
 export default function App() {
 
@@ -68,51 +77,65 @@ export default function App() {
 
   const handleTakePhoto = () => {
     console.log("Capturing photo...");
-  
+
     if (!videoRef.current || !canvasRef.current) {
-      console.warn("Video or Canvas element not found!");
-      return;
+        console.warn("Video or Canvas element not found!");
+        return;
     }
-  
+
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
     console.log("Photo captured and drawn onto canvas.");
-  
+
     canvas.toBlob(async (blob) => {
-      if (!blob) {
-        console.warn("Failed to capture photo as blob.");
-        return;
-      }
-  
-      console.log("Uploading photo to imgBB...");
-  
-      const formData = new FormData();
-      formData.append("image", blob);
-  
-      try {
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_KEY}`, {
-          method: "POST",
-          body: formData,
-        });
-  
-        const data = await response.json();
-        if (data.success) {
-          const imageUrl = data.data.url;
-          console.log("Image URL:", imageUrl);
-  
-          await addDoc(collection(db, "shirts"), { image: imageUrl });
-          console.log("Photo URL saved to Firestore database.");
-  
-          alert("Photo uploaded successfully!");
-        } else {
-          console.error("Error uploading to imgBB:", data);
+        if (!blob) {
+            console.warn("Failed to capture photo as blob.");
+            return;
         }
-      } catch (error) {
-        console.error("Error:", error);
-      }
+
+        console.log("Uploading photo to imgBB...");
+
+        const formData = new FormData();
+        formData.append("image", blob);
+
+        try {
+            const imgBBResponse = await fetch(`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_KEY}`, {
+                method: "POST",
+                body: formData,
+            });
+
+            const imgBBData = await imgBBResponse.json();
+
+            if (imgBBData.success) {
+                const imageUrl = imgBBData.data.url;
+                console.log("✅ Image uploaded to imgBB:", imageUrl);
+
+                // 🔹 Store the image URL in Firestore
+                await addDoc(collection(db, "shirts"), { image: imageUrl });
+                console.log("✅ Photo URL saved to Firestore database.");
+
+                // 🔹 Send the image URL to Flask API
+                const flaskResponse = await fetch("http://127.0.0.1:5000/process_image", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ image_url: imageUrl })
+                });
+
+                const flaskData = await flaskResponse.json();
+                console.log("✅ Flask Response:", flaskData);
+
+                alert("Photo uploaded and processed successfully!");
+            } else {
+                console.error("❌ Error uploading to imgBB:", imgBBData);
+            }
+        } catch (error) {
+            console.error("❌ Error:", error);
+        }
     }, "image/jpeg");
-  };
+};
 
   const handleUploadPhoto = () => {
     const fileInput = document.createElement('input');
@@ -152,50 +175,62 @@ export default function App() {
     }
   };
 
-
   useEffect(() => {
     const fetchAllCollections = async () => {
       let allItems = [];
       let allCategories = [];
-
-      const dbCategories = await fetchCollections();
-
-      for (const collectionName of dbCategories) {
+  
+      const formattedCategories = await fetchCollections();
+  
+      for (const formattedCategory of formattedCategories) {
         try {
-          const querySnapshot = await getDocs(collection(db, collectionName));
-
+          // 🔹 Convert formatted name back to Firestore-friendly format (underscores)
+          const firestoreCategory = formattedCategory.toLowerCase().replace(/\s/g, "_");
+  
+          const querySnapshot = await getDocs(collection(db, firestoreCategory));
+  
           const collectionItems = querySnapshot.docs.map((doc) => ({
             id: doc.id,
-            category: collectionName,
+            category: formattedCategory, // ✅ Use formatted name in UI
             name: doc.data().name || "Unnamed Item",
             description: doc.data().description || "No description available",
             colour: doc.data().colour || "Unknown",
             image: doc.data().image || "",
           }));
-
+  
           if (collectionItems.length > 0) {
-            allCategories.push(collectionName);
+            allCategories.push(formattedCategory); // ✅ Keep formatted categories
           }
-
+  
           allItems = [...allItems, ...collectionItems];
         } catch (error) {
-          console.error(`Error fetching collection ${collectionName}:`, error);
+          console.error(`Error fetching collection ${formattedCategory}:`, error);
         }
       }
-
+  
       setItems(allItems);
       setCategories(allCategories);
       setSelectedCategory(allCategories[0] || "");
     };
-
+  
     fetchAllCollections();
   }, []);
+  
 
   useEffect(() => {
-    (async () => {
-      setCategories(await fetchCollections());
-    })();
+    const fetchAndSetCategories = async () => {
+      const formattedCategories = await fetchCollections();
+      console.log("✅ Final Categories:", formattedCategories); // Debugging
+  
+      if (formattedCategories.length > 0) {
+        setCategories(formattedCategories); // ✅ Ensure categories are set
+        setSelectedCategory(formattedCategories[0]); // ✅ Set first category as default
+      }
+    };
+  
+    fetchAndSetCategories();
   }, []);
+  
 
   return (
     <Router>
@@ -205,17 +240,17 @@ export default function App() {
             <header className="wardrobe-header">My Wardrobe</header>
 
             <div className="main-content">
-              <div className="category-buttons">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    className={`category-btn ${selectedCategory === category ? "active" : ""}`}
-                    onClick={() => setSelectedCategory(category)}
-                  >
-                    {category.charAt(0).toUpperCase() + category.slice(1)}
-                  </button>
-                ))}
-              </div>
+            <div className="category-buttons">
+  {categories.map((category) => (
+    <button
+      key={category}
+      className={`category-btn ${selectedCategory === category ? "active" : ""}`}
+      onClick={() => setSelectedCategory(category)}
+    >
+      {category} {/* 🔹 Already formatted */}
+    </button>
+  ))}
+</div>
 
               {items.length > 0 ? (
                 <div className="item-grid">
