@@ -26,4 +26,6 @@ dist-ssr
 # Python
 *.pyc
 .env
+
+flask_session/
 venv/

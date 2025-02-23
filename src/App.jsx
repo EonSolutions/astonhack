@@ -1,41 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import { AiOutlineHome, AiOutlinePlus, AiOutlineUser, AiOutlineMessage, AiOutlineCloudUpload, AiOutlineCamera, AiOutlineBarChart } from "react-icons/ai";
 import { db } from "./lib/firebase";
 import Profile from "./Profile";
 import Dashboard from "./Dashboard";
 import "./App.css";
-
-const formatCategoryName = (category) => {
-  return category
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-};
-
-const fetchCollections = async () => {
-  try {
-    const snapshot = await getDocs(collection(db, "Collections")); // Replace with the actual collection name
-    const dbCategories = snapshot.docs.map(doc => doc.id); // Extracts document IDs
-
-    const formattedCategories = dbCategories.map(formatCategoryName);
-
-    return formattedCategories;
-  } catch (error) {
-    console.error("Error fetching collections:", error);
-    return [];
-  }
-};
-
-// Call this function where needed (e.g., inside a React component)
-fetchCollections().then(formattedCategories => {
-  console.log("Collections Array:", formattedCategories);
-});
+import ChatBotPage from "./ChatBot";
+import { fetchCollections, getAllCategories } from "./lib/categories";
+import MapPage from "./Map";
 
 
 export default function App() {
-
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("long_sleeve_top");
   const [items, setItems] = useState([]);
@@ -47,9 +23,21 @@ export default function App() {
   const [expandedDescriptions, setExpandedDescriptions] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [addedItems, setAddedItems] = useState([]);
+  const [showAddedItemsModal, setShowAddedItemsModal] = useState(false);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+
+  useEffect(() => {
+    // Check localStorage for added items on app load
+    const storedItems = JSON.parse(localStorage.getItem("addedItems"));
+    if (storedItems && storedItems.length > 0) {
+      setAddedItems(storedItems);
+      setShowAddedItemsModal(true);
+    }
+  }, []);
 
   const toggleDescription = (itemId) => {
     setExpandedDescriptions((prevState) => ({
@@ -83,6 +71,31 @@ export default function App() {
       console.error("Error accessing camera:", error);
       alert("Error accessing camera: " + error.message);
     }
+  };
+
+  const AddedItemsModal = ({ addedItems, onClose }) => {
+    const handleClose = () => {
+      localStorage.removeItem("addedItems"); // Clear localStorage
+      onClose(); // Close the modal
+    };
+
+    return (
+      <div className="popup-overlay" onClick={handleClose}>
+        <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+          <h3>Items Added Successfully!</h3>
+          <p>{addedItems.length} item(s) have been added!</p>
+          {/* <ul>
+            {addedItems.map((item) => (
+              <li key={item.id}>
+                <strong>{item.name}</strong> - {item.description}
+              </li>
+            ))}
+          </ul> */}
+          {/* Move the Close button here */}
+          <button className="close-btn" onClick={handleClose}>Close</button>
+        </div>
+      </div>
+    );
   };
 
   const handleTakePhoto = () => {
@@ -126,28 +139,32 @@ export default function App() {
           console.log("✅ Image uploaded to imgBB:", imageUrl);
 
           // Store the image URL in Firestore
-          await addDoc(collection(db, "shirts"), { image: imageUrl });
+          const newItem = {
+            id: new Date().getTime().toString(), // Generate a unique ID
+            name: "New Outfit", // Default name
+            description: "Added via photo upload", // Default description
+            image: imageUrl,
+          };
+
+          await addDoc(collection(db, "shirts"), newItem);
           console.log("✅ Photo URL saved to Firestore database.");
 
-          // Send image to Flask for processing
-          const flaskResponse = await fetch("http://127.0.0.1:5000/process_image", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image_url: imageUrl })
-          });
-
-          const flaskData = await flaskResponse.json();
-          console.log("✅ Flask Response:", flaskData);
+          // Save the added item to localStorage
+          const existingItems = JSON.parse(localStorage.getItem("addedItems")) || [];
+          const updatedItems = [...existingItems, newItem];
+          localStorage.setItem("addedItems", JSON.stringify(updatedItems));
 
           // Show success message
           setShowSuccess(true);
           setShowPopup(false);
-          setTimeout(() => {
-            setShowSuccess(false);
-            window.location.reload(); 
-          }, 1500); // Refresh after animation ends
 
-          alert("✅ Photo uploaded and processed successfully!");
+          // Immediately show the loading component
+          setIsProcessing(true);
+
+          // Refresh the page after a short delay
+          setTimeout(() => {
+            window.location.reload();
+          }, 100); // Small delay to ensure the loading component is visible
         } else {
           console.error("❌ Error uploading to imgBB:", imgBBData);
         }
@@ -159,12 +176,76 @@ export default function App() {
     }, "image/jpeg");
   };
 
+  const handleUploadPhoto = async (event) => {
+    const file = event.target.files[0]; // Get the selected file
+    if (!file) {
+      console.warn("⚠️ No file selected!");
+      return;
+    }
 
-  const handleUploadPhoto = () => {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
-    fileInput.click();
+    setIsProcessing(true); // Show loading animation
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      // Upload image to imgBB
+      const imgBBResponse = await fetch(`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_KEY}`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const imgBBData = await imgBBResponse.json();
+
+      if (imgBBData.success) {
+        const imageUrl = imgBBData.data.url;
+        console.log("✅ Image uploaded to imgBB:", imageUrl);
+
+        // Store the image URL in Firestore
+        const newItem = {
+          id: new Date().getTime().toString(), // Generate a unique ID
+          name: "New Outfit", // Default name
+          description: "Added via file upload", // Default description
+          image: imageUrl,
+        };
+
+        await addDoc(collection(db, "shirts"), newItem);
+        console.log("✅ Photo URL saved to Firestore database.");
+
+        // Save the added item to localStorage
+        const existingItems = JSON.parse(localStorage.getItem("addedItems")) || [];
+        const updatedItems = [...existingItems, newItem];
+        localStorage.setItem("addedItems", JSON.stringify(updatedItems));
+
+        // Send image to Flask for processing
+        const flaskResponse = await fetch("http://127.0.0.1:5000/process_image", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image_url: imageUrl }),
+        });
+
+        const flaskData = await flaskResponse.json();
+        console.log("✅ Flask Response:", flaskData);
+
+        // Show success message
+        setShowSuccess(true);
+        setShowPopup(false);
+
+        // Immediately show the loading component
+        setIsProcessing(true);
+
+        // Refresh the page after a short delay
+        setTimeout(() => {
+          window.location.reload();
+        }, 100); // Small delay to ensure the loading component is visible
+      } else {
+        console.error("❌ Error uploading to imgBB:", imgBBData);
+      }
+    } catch (error) {
+      console.error("❌ Error:", error);
+    } finally {
+      setIsProcessing(false); // Stop loading animation
+    }
   };
 
   const closePopup = () => {
@@ -198,187 +279,181 @@ export default function App() {
     }
   };
 
+  const LoadingComponent = () => (
+    <div className="loading-overlay">
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p className="loading-text">Loading wardrobe...</p>
+      </div>
+    </div>
+  );
+
+  useEffect(() => {
+    if (addedItems.length > 0) {
+      setShowAddedItemsModal(true);
+    }
+  }, [addedItems]);
+
+  const closeAddedItemsModal = () => {
+    setShowAddedItemsModal(false);
+    setAddedItems([]); // Clear the added items
+  };
+
   useEffect(() => {
     const fetchAllCollections = async () => {
-      let allItems = [];
-      let allCategories = [];
-
-      const formattedCategories = await fetchCollections();
-
-      for (const formattedCategory of formattedCategories) {
-        try {
-          // 🔹 Convert formatted name back to Firestore-friendly format (underscores)
-          const firestoreCategory = formattedCategory.toLowerCase().replace(/\s/g, "_");
-
-          const querySnapshot = await getDocs(collection(db, firestoreCategory));
-
-          const collectionItems = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            category: formattedCategory, // ✅ Use formatted name in UI
-            name: doc.data().name || "Unnamed Item",
-            description: doc.data().description || "No description available",
-            colour: doc.data().colour || "Unknown",
-            image: doc.data().image || "",
-          }));
-
-          if (collectionItems.length > 0) {
-            allCategories.push(formattedCategory); // ✅ Keep formatted categories
-          }
-
-          allItems = [...allItems, ...collectionItems];
-        } catch (error) {
-          console.error(`Error fetching collection ${formattedCategory}:`, error);
-        }
-      }
+      const [allItems, allCategories] = await getAllCategories();
 
       setItems(allItems);
       setCategories(allCategories);
       setSelectedCategory(allCategories[0] || "");
+      setLoading(false); // Data fetching is complete
     };
 
     fetchAllCollections();
   }, []);
 
-
-  useEffect(() => {
-    const fetchAndSetCategories = async () => {
-      const formattedCategories = await fetchCollections();
-      console.log("✅ Final Categories:", formattedCategories); // Debugging
-
-      if (formattedCategories.length > 0) {
-        setCategories(formattedCategories); // ✅ Ensure categories are set
-        setSelectedCategory(formattedCategories[0]); // ✅ Set first category as default
-      }
-    };
-
-    fetchAndSetCategories();
-  }, []);
-
-
   return (
     <Router>
       <Routes>
-        <Route path="/" element={
-          <div className="wardrobe-container">
+        <Route
+          path="/"
+          element={
+            <div className="wardrobe-container">
+              {/* Show loading component if processing or refreshing */}
+              {(loading || isProcessing) && <LoadingComponent />}
 
-            <header className="wardrobe-header">My Wardrobe</header>
+              {!loading && !isProcessing && (
+                <>
+                  <header className="wardrobe-header">My Wardrobe</header>
 
-            <div className="main-content">
-              <div className="category-buttons">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    className={`category-btn ${selectedCategory === category ? "active" : ""}`}
-                    onClick={() => setSelectedCategory(category)}
-                  >
-                    {category} {/* 🔹 Already formatted */}
-                  </button>
-                ))}
-              </div>
+                  <div className="main-content">
+                    <div className="category-buttons">
+                      {categories.map((category) => (
+                        <button
+                          key={category}
+                          className={`category-btn ${selectedCategory === category ? "active" : ""}`}
+                          onClick={() => setSelectedCategory(category)}
+                        >
+                          {category}
+                        </button>
+                      ))}
+                    </div>
 
-              {items.length > 0 ? (
-                <div className="item-grid">
-                  {items
-                    .filter((item) => item.category === selectedCategory)
-                    .map((item) => (
-                      <div className="item-card">
-                        <div className="item-image-container">
-                          <img src={item.image} alt={item.name} className="item-image" />
-                        </div>
+                    {items.length > 0 ? (
+                      <div className="item-grid">
+                        {items
+                          .filter((item) => item.category === selectedCategory)
+                          .map((item) => (
+                            <div className="item-card" key={item.id}>
+                              <div className="item-image-container">
+                                <img src={item.image} alt={item.name} className="item-image" />
+                              </div>
 
-                        <h3 className="item-title">{item.name}</h3>
+                              <h3 className="item-title">{item.name}</h3>
 
-                        <div className="item-description">
-                          {item.description.split(" ").length > 10 ? (
-                            <div>
-                              {!expandedDescriptions[item.id] ? (
-                                <p>{item.description.split(" ").slice(0, 10).join(" ")}...</p>
-                              ) : (
-                                <p>{item.description}</p>
-                              )}
+                              <div className="item-description">
+                                {item.description.split(" ").length > 10 ? (
+                                  <div>
+                                    {!expandedDescriptions[item.id] ? (
+                                      <p>{item.description.split(" ").slice(0, 10).join(" ")}...</p>
+                                    ) : (
+                                      <p>{item.description}</p>
+                                    )}
 
-                              <button
-                                className="see-description-btn"
-                                onClick={() => toggleDescription(item.id)}
-                              >
-                                {expandedDescriptions[item.id] ? "Hide Description" : "See Description"}
-                              </button>
+                                    <button
+                                      className="see-description-btn"
+                                      onClick={() => toggleDescription(item.id)}
+                                    >
+                                      {expandedDescriptions[item.id] ? "Hide Description" : "See Description"}
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <p>{item.description}</p>
+                                )}
+                              </div>
                             </div>
-                          ) : (
-                            <p>{item.description}</p>
-                          )}
-                        </div>
+                          ))}
                       </div>
-                    ))}
-                </div>
-              ) : (
-                <div className="empty-category">
-                  <p>No items in this category</p>
-                </div>
-              )}
-            </div>
-
-            <div className="bottom-navbar">
-              <button className="nav-btn"><AiOutlineHome size={30} /></button>
-              <button className="nav-btn"><AiOutlineMessage size={30} /></button>
-              <button className="nav-btn" onClick={() => setShowPopup(true)}><AiOutlinePlus size={30} /></button>
-              <Link to="/dashboard" className="nav-btn"><AiOutlineBarChart size={30} /></Link>
-              <Link to="/profile" className="nav-btn"><AiOutlineUser size={30} /></Link>
-            </div>
-
-            {showPopup && (
-              <div className={`popup-overlay ${isUploadClosing ? "closing" : ""}`} onClick={closePopup}>
-                <div className={`popup-content ${isUploadClosing ? "closing" : ""}`} onClick={(e) => e.stopPropagation()}>
-                  <div
-                    className={`upload-box ${isDragging ? "dragging" : ""}`}
-                    onDragEnter={handleDragStart}
-                    onDragOver={handleDragStart}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                  >
-                    <AiOutlineCloudUpload className="upload-icon" />
-                    <p className="upload-text">Drag & drop your files here or</p>
-                    <button className="upload-btn">Choose files</button>
+                    ) : (
+                      <div className="empty-category">
+                        <p>No items in this category</p>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Take Photo Button */}
-                  <button className="take-photo-btn" onClick={handleOpenCamera}>
-                    <AiOutlineCamera className="camera-icon" /> Take a Photo
-                  </button>
-                </div>
-              </div>
-            )}
+                  <div className="bottom-navbar">
+                    <button className="nav-btn"><AiOutlineHome size={30} /></button>
+                    <Link to="/chat" className="nav-btn"><AiOutlineMessage size={30} /></Link>
+                    <button className="nav-btn" onClick={() => setShowPopup(true)}><AiOutlinePlus size={30} /></button>
+                    <Link to="/dashboard" className="nav-btn"><AiOutlineBarChart size={30} /></Link>
+                    <Link to="/profile" className="nav-btn"><AiOutlineUser size={30} /></Link>
+                  </div>
 
-            {/* Camera Popup */}
-            {showCameraPopup && (
-              <div className="popup-overlay" onClick={() => setShowCameraPopup(false)}>
-                <div className="camera-popup">
-                  <video ref={videoRef} className="camera-preview" autoPlay playsInline></video>
-                  <canvas ref={canvasRef} width="300" height="200" style={{ display: "none" }}></canvas>
-                  <button className="popup-btn" onClick={handleTakePhoto}>Capture Photo</button>
-                  <button className="close-btn" onClick={() => setShowCameraPopup(false)}>Close</button>
-                </div>
-              </div>
-            )}
+                  {showPopup && (
+                    <div className={`popup-overlay ${isUploadClosing ? "closing" : ""}`} onClick={closePopup}>
+                      <div className={`popup-content ${isUploadClosing ? "closing" : ""}`} onClick={(e) => e.stopPropagation()}>
+                        <div
+                          className={`upload-box ${isDragging ? "dragging" : ""}`}
+                          onDragEnter={handleDragStart}
+                          onDragOver={handleDragStart}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                        >
+                          <AiOutlineCloudUpload className="upload-icon" />
+                          <p className="upload-text">Drag & drop your files here or</p>
+                          <button className="upload-btn" onClick={() => document.getElementById("file-input").click()}>
+                            Choose files
+                          </button>
+                          <input
+                            id="file-input"
+                            type="file"
+                            accept="image/*"
+                            style={{ display: "none" }}
+                            onChange={handleUploadPhoto}
+                          />
+                        </div>
 
-            {isProcessing && (
-              <div className="loading-overlay">
-                <div className="loading-container">
-                  <div className="loading-spinner"></div>
-                  <p className="loading-text">Processing image...</p>
-                </div>
-              </div>
-            )}
+                        {/* Take Photo Button */}
+                        <button className="take-photo-btn" onClick={handleOpenCamera}>
+                          <AiOutlineCamera className="camera-icon" /> Take a Photo
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
-            {showSuccess && (
-              <div className="success-toast">
-                ✅ Your outfit has been added!
-              </div>
-            )}
-          </div>
-        } />
+                  {/* Camera Popup */}
+                  {showCameraPopup && (
+                    <div className="popup-overlay" onClick={() => setShowCameraPopup(false)}>
+                      <div className="camera-popup">
+                        <video ref={videoRef} className="camera-preview" autoPlay playsInline></video>
+                        <canvas ref={canvasRef} width="300" height="200" style={{ display: "none" }}></canvas>
+                        <button className="popup-btn" onClick={handleTakePhoto}>Capture Photo</button>
+                        <button className="close-btn" onClick={() => setShowCameraPopup(false)}>Close</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {isProcessing && (
+                    <div className="loading-overlay">
+                      <div className="loading-container">
+                        <div className="loading-spinner"></div>
+                        <p className="loading-text">Processing image...</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {showAddedItemsModal && (
+                    <AddedItemsModal addedItems={addedItems} onClose={() => setShowAddedItemsModal(false)} />
+                  )}
+                </>
+              )}
+            </div>
+          }
+        />
+        <Route path="/map" element={<MapPage />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/chat" element={<ChatBotPage />} />
       </Routes>
     </Router>
   );
