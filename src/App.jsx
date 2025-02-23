@@ -117,7 +117,7 @@ export default function App() {
   };
 
   const handleTakePhoto = () => {
-    console.log("📸 Capturing photo...");
+    // console.log("📸 Capturing photo...");
 
     if (!videoRef.current || !canvasRef.current) {
       console.warn("⚠️ Video or Canvas element not found!");
@@ -129,7 +129,7 @@ export default function App() {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-    console.log("✅ Photo captured and drawn onto canvas.");
+    // console.log("✅ Photo captured and drawn onto canvas.");
 
     canvas.toBlob(async (blob) => {
       if (!blob) {
