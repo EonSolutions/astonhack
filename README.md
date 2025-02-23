@@ -1,14 +1,14 @@
 # Welcome to Re:Style!
 
-Re:Style is an innovative, AI-powered platform designed to digitise your wardrobe, provide smart outfit recommendations, and promote sustainable fashion choices through AI-powered thrift store integration and fashion analytics.
+**Re:Style** is an innovative, AI-powered platform designed to digitise your wardrobe, provide smart outfit recommendations, and promote sustainable fashion choices through AI-powered thrift store integration and fashion analytics.
 
 ## Key Features:
 
-- AI-Powered Clothing Recognition – Instantly detects and categorises clothing from uploaded images.
-- Digital Wardrobe Management – Easily browse and organise your clothes.
-- Outfit Reuse Tracking – See your most and least worn outfits.
-- AI Fashion Assistant – Get real-time outfit recommendations based on weather, occasion, and your existing wardrobe.
-- Thrift Store Integration – Discover and shortlist sustainable fashion options from local thrift stores.
+- **AI-Powered Clothing Recognition** – Instantly detects and categorises clothing from uploaded images.
+- **Digital Wardrobe Management** – Easily browse and organise your clothes.
+- **Outfit Reuse Tracking** – See your most and least worn outfits.
+- **AI Fashion Assistant** – Get real-time outfit recommendations based on weather, occasion, and your existing wardrobe.
+- **Thrift Store Integration** – Discover and shortlist sustainable fashion options from local thrift stores.
 
 ## How Does Re:Style Work?
 
