@@ -24,9 +24,20 @@ export default function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [addedItems, setAddedItems] = useState([]);
+  const [showAddedItemsModal, setShowAddedItemsModal] = useState(false);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+
+  useEffect(() => {
+    // Check localStorage for added items on app load
+    const storedItems = JSON.parse(localStorage.getItem("addedItems"));
+    if (storedItems && storedItems.length > 0) {
+      setAddedItems(storedItems);
+      setShowAddedItemsModal(true);
+    }
+  }, []);
 
   const toggleDescription = (itemId) => {
     setExpandedDescriptions((prevState) => ({
@@ -60,6 +71,31 @@ export default function App() {
       console.error("Error accessing camera:", error);
       alert("Error accessing camera: " + error.message);
     }
+  };
+
+  const AddedItemsModal = ({ addedItems, onClose }) => {
+    const handleClose = () => {
+      localStorage.removeItem("addedItems"); // Clear localStorage
+      onClose(); // Close the modal
+    };
+
+    return (
+      <div className="popup-overlay" onClick={handleClose}>
+        <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+          <h3>Items Added Successfully!</h3>
+          <p>{addedItems.length} item(s) have been added!</p>
+          {/* <ul>
+            {addedItems.map((item) => (
+              <li key={item.id}>
+                <strong>{item.name}</strong> - {item.description}
+              </li>
+            ))}
+          </ul> */}
+          {/* Move the Close button here */}
+          <button className="close-btn" onClick={handleClose}>Close</button>
+        </div>
+      </div>
+    );
   };
 
   const handleTakePhoto = () => {
@@ -103,28 +139,32 @@ export default function App() {
           console.log("✅ Image uploaded to imgBB:", imageUrl);
 
           // Store the image URL in Firestore
-          await addDoc(collection(db, "shirts"), { image: imageUrl });
+          const newItem = {
+            id: new Date().getTime().toString(), // Generate a unique ID
+            name: "New Outfit", // Default name
+            description: "Added via photo upload", // Default description
+            image: imageUrl,
+          };
+
+          await addDoc(collection(db, "shirts"), newItem);
           console.log("✅ Photo URL saved to Firestore database.");
 
-          // Send image to Flask for processing
-          const flaskResponse = await fetch("http://127.0.0.1:5000/process_image", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image_url: imageUrl })
-          });
-
-          const flaskData = await flaskResponse.json();
-          console.log("✅ Flask Response:", flaskData);
+          // Save the added item to localStorage
+          const existingItems = JSON.parse(localStorage.getItem("addedItems")) || [];
+          const updatedItems = [...existingItems, newItem];
+          localStorage.setItem("addedItems", JSON.stringify(updatedItems));
 
           // Show success message
           setShowSuccess(true);
           setShowPopup(false);
-          setTimeout(() => {
-            setShowSuccess(false);
-            window.location.reload();
-          }, 1500); // Refresh after animation ends
 
-          alert("✅ Photo uploaded and processed successfully!");
+          // Immediately show the loading component
+          setIsProcessing(true);
+
+          // Refresh the page after a short delay
+          setTimeout(() => {
+            window.location.reload();
+          }, 100); // Small delay to ensure the loading component is visible
         } else {
           console.error("❌ Error uploading to imgBB:", imgBBData);
         }
@@ -136,12 +176,76 @@ export default function App() {
     }, "image/jpeg");
   };
 
+  const handleUploadPhoto = async (event) => {
+    const file = event.target.files[0]; // Get the selected file
+    if (!file) {
+      console.warn("⚠️ No file selected!");
+      return;
+    }
 
-  const handleUploadPhoto = () => {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
-    fileInput.click();
+    setIsProcessing(true); // Show loading animation
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      // Upload image to imgBB
+      const imgBBResponse = await fetch(`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_KEY}`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const imgBBData = await imgBBResponse.json();
+
+      if (imgBBData.success) {
+        const imageUrl = imgBBData.data.url;
+        console.log("✅ Image uploaded to imgBB:", imageUrl);
+
+        // Store the image URL in Firestore
+        const newItem = {
+          id: new Date().getTime().toString(), // Generate a unique ID
+          name: "New Outfit", // Default name
+          description: "Added via file upload", // Default description
+          image: imageUrl,
+        };
+
+        await addDoc(collection(db, "shirts"), newItem);
+        console.log("✅ Photo URL saved to Firestore database.");
+
+        // Save the added item to localStorage
+        const existingItems = JSON.parse(localStorage.getItem("addedItems")) || [];
+        const updatedItems = [...existingItems, newItem];
+        localStorage.setItem("addedItems", JSON.stringify(updatedItems));
+
+        // Send image to Flask for processing
+        const flaskResponse = await fetch("http://127.0.0.1:5000/process_image", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image_url: imageUrl }),
+        });
+
+        const flaskData = await flaskResponse.json();
+        console.log("✅ Flask Response:", flaskData);
+
+        // Show success message
+        setShowSuccess(true);
+        setShowPopup(false);
+
+        // Immediately show the loading component
+        setIsProcessing(true);
+
+        // Refresh the page after a short delay
+        setTimeout(() => {
+          window.location.reload();
+        }, 100); // Small delay to ensure the loading component is visible
+      } else {
+        console.error("❌ Error uploading to imgBB:", imgBBData);
+      }
+    } catch (error) {
+      console.error("❌ Error:", error);
+    } finally {
+      setIsProcessing(false); // Stop loading animation
+    }
   };
 
   const closePopup = () => {
@@ -185,6 +289,17 @@ export default function App() {
   );
 
   useEffect(() => {
+    if (addedItems.length > 0) {
+      setShowAddedItemsModal(true);
+    }
+  }, [addedItems]);
+
+  const closeAddedItemsModal = () => {
+    setShowAddedItemsModal(false);
+    setAddedItems([]); // Clear the added items
+  };
+
+  useEffect(() => {
     const fetchAllCollections = async () => {
       const [allItems, allCategories] = await getAllCategories();
 
@@ -204,9 +319,10 @@ export default function App() {
           path="/"
           element={
             <div className="wardrobe-container">
-              {loading ? (
-                <LoadingComponent />
-              ) : (
+              {/* Show loading component if processing or refreshing */}
+              {(loading || isProcessing) && <LoadingComponent />}
+
+              {!loading && !isProcessing && (
                 <>
                   <header className="wardrobe-header">My Wardrobe</header>
 
@@ -285,7 +401,16 @@ export default function App() {
                         >
                           <AiOutlineCloudUpload className="upload-icon" />
                           <p className="upload-text">Drag & drop your files here or</p>
-                          <button className="upload-btn">Choose files</button>
+                          <button className="upload-btn" onClick={() => document.getElementById("file-input").click()}>
+                            Choose files
+                          </button>
+                          <input
+                            id="file-input"
+                            type="file"
+                            accept="image/*"
+                            style={{ display: "none" }}
+                            onChange={handleUploadPhoto}
+                          />
                         </div>
 
                         {/* Take Photo Button */}
@@ -317,10 +442,8 @@ export default function App() {
                     </div>
                   )}
 
-                  {showSuccess && (
-                    <div className="success-toast">
-                      ✅ Your outfit has been added!
-                    </div>
+                  {showAddedItemsModal && (
+                    <AddedItemsModal addedItems={addedItems} onClose={() => setShowAddedItemsModal(false)} />
                   )}
                 </>
               )}
@@ -329,8 +452,8 @@ export default function App() {
         />
         <Route path="/map" element={<MapPage />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/chat" element={<ChatBotPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/chat" element={<ChatBotPage />} />
       </Routes>
     </Router>
   );
