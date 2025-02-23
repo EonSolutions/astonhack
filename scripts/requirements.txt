@@ -1,10 +1,11 @@
 flask
 numpy
 requests
-cv2
+opencv-python
 firebase_admin
 dotenv
 ultralytics
 transformers
 PIL
 openai
+pillow
