@@ -1,14 +1,16 @@
-# Welcome to Re:Style!
+![RE:STYLE banner](https://i.imgur.com/TgwRLSL.png)
 
-Re:Style is an innovative, AI-powered platform designed to digitise your wardrobe, provide smart outfit recommendations, and promote sustainable fashion choices through AI-powered thrift store integration and fashion analytics.
+<p align="center">
+<strong>Re:Style</strong> is an innovative, AI-powered platform designed to digitise your wardrobe, provide smart outfit recommendations, and promote sustainable fashion choices through AI-powered thrift store integration and fashion analytics.
+</p>
 
 ## Key Features:
 
-- AI-Powered Clothing Recognition – Instantly detects and categorises clothing from uploaded images.
-- Digital Wardrobe Management – Easily browse and organise your clothes.
-- Outfit Reuse Tracking – See your most and least worn outfits.
-- AI Fashion Assistant – Get real-time outfit recommendations based on weather, occasion, and your existing wardrobe.
-- Thrift Store Integration – Discover and shortlist sustainable fashion options from local thrift stores.
+- **AI-Powered Clothing Recognition** – Instantly detects and categorises clothing from uploaded images.
+- **Digital Wardrobe Management** – Easily browse and organise your clothes.
+- **Outfit Reuse Tracking** – See your most and least worn outfits.
+- **AI Fashion Assistant** – Get real-time outfit recommendations based on weather, occasion, and your existing wardrobe.
+- **Thrift Store Integration** – Discover and shortlist sustainable fashion options from local thrift stores.
 
 ## How Does Re:Style Work?
 
@@ -17,24 +19,6 @@ Re:Style allows users to upload images of their clothing, which are then process
 The AI model suggests outfits based on your wardrobe, factoring in usage history, personal style, and environmental conditions. To promote sustainability, users can track clothing usage, swap underused items, and explore second-hand fashion through integrated thrift store listings.
 
 Our thrift store feature enables second-hand retailers to list available inventory, making it easy for users to explore, compare, and shortlist items. Combined with AI-powered recommendations, Re:Style ensures users can make eco-conscious fashion choices with just a tap.
-
-## Installation
-
-Clone the repository:
-
-git clone https://github.com/YourRepo/Re-Style.git
-
-Navigate to the project folder:
-
-cd re-style
-
-Install dependencies:
-
-npm install
-
-Run the application:
-
-npm run dev
 
 ## Demo Usage
 
@@ -62,8 +46,11 @@ Thank you for the opportunity to explore the intersection of fashion, AI, and su
 ## Contact
 
 👤 Kerem Uygun – keremuygun86@gmail.com
-👤 Tom Shtaseo – veschi@gmail.com
+
+👤 Tom Shtasel – veschi@gmail.com
+
 👤 Wilbert Tham – wilbertthxm@gmail.com
+
 👤 Harry Day – hdkeyworth@gmail.com
 
 
