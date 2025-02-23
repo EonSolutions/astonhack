@@ -244,4 +244,15 @@
   border-radius: 8px;
   object-fit: cover;
   margin-right: 12px;
-}  
+}
+
+.outfit-info {
+  display: block;
+  margin-left: 10px;
+}
+
+.outfit-info > h3 {
+  text-align: left;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}

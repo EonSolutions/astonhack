@@ -164,7 +164,8 @@ export default function ChatBotPage() {
                       className="outfit-image"
                     />
                     <div className="outfit-info">
-                      <h3>{item.name}</h3> <p>{item.description}</p>
+                      <h3>{item.name}</h3>
+                      <p>{item.description}</p>
                     </div>
                   </div>
                 ))}
