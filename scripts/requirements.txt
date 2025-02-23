@@ -7,3 +7,4 @@ dotenv
 ultralytics
 transformers
 PIL
+openai
