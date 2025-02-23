@@ -1,37 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import { AiOutlineHome, AiOutlinePlus, AiOutlineUser, AiOutlineMessage, AiOutlineCloudUpload, AiOutlineCamera, AiOutlineBarChart } from "react-icons/ai";
 import { db } from "./lib/firebase";
 import Profile from "./Profile";
 import Dashboard from "./Dashboard";
 import "./App.css";
-
-const formatCategoryName = (category) => {
-  return category
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-};
-
-const fetchCollections = async () => {
-  try {
-    const snapshot = await getDocs(collection(db, "Collections")); // Replace with the actual collection name
-    const dbCategories = snapshot.docs.map(doc => doc.id); // Extracts document IDs
-
-    const formattedCategories = dbCategories.map(formatCategoryName);
-
-    return formattedCategories;
-  } catch (error) {
-    console.error("Error fetching collections:", error);
-    return [];
-  }
-};
-
-// Call this function where needed (e.g., inside a React component)
-fetchCollections().then(formattedCategories => {
-  console.log("Collections Array:", formattedCategories);
-});
+import ChatBotPage from "./ChatBot";
+import { fetchCollections, getAllCategories } from "./lib/categories";
 
 
 export default function App() {
@@ -185,36 +161,7 @@ export default function App() {
 
   useEffect(() => {
     const fetchAllCollections = async () => {
-      let allItems = [];
-      let allCategories = [];
-
-      const formattedCategories = await fetchCollections();
-
-      for (const formattedCategory of formattedCategories) {
-        try {
-          // 🔹 Convert formatted name back to Firestore-friendly format (underscores)
-          const firestoreCategory = formattedCategory.toLowerCase().replace(/\s/g, "_");
-
-          const querySnapshot = await getDocs(collection(db, firestoreCategory));
-
-          const collectionItems = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            category: formattedCategory, // ✅ Use formatted name in UI
-            name: doc.data().name || "Unnamed Item",
-            description: doc.data().description || "No description available",
-            colour: doc.data().colour || "Unknown",
-            image: doc.data().image || "",
-          }));
-
-          if (collectionItems.length > 0) {
-            allCategories.push(formattedCategory); // ✅ Keep formatted categories
-          }
-
-          allItems = [...allItems, ...collectionItems];
-        } catch (error) {
-          console.error(`Error fetching collection ${formattedCategory}:`, error);
-        }
-      }
+      const [allItems, allCategories] = await getAllCategories();
 
       setItems(allItems);
       setCategories(allCategories);
@@ -304,7 +251,7 @@ export default function App() {
 
             <div className="bottom-navbar">
               <button className="nav-btn"><AiOutlineHome size={30} /></button>
-              <button className="nav-btn"><AiOutlineMessage size={30} /></button>
+              <Link to="/chat" className="nav-btn"><AiOutlineMessage size={30} /></Link>
               <button className="nav-btn" onClick={() => setShowPopup(true)}><AiOutlinePlus size={30} /></button>
               <Link to="/dashboard" className="nav-btn"><AiOutlineBarChart size={30} /></Link>
               <Link to="/profile" className="nav-btn"><AiOutlineUser size={30} /></Link>
@@ -347,6 +294,7 @@ export default function App() {
           </div>
         } />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/chat" element={<ChatBotPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>

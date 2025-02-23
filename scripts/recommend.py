@@ -2,6 +2,8 @@ from flask import Flask, request, session, jsonify
 from openai import OpenAI
 import os
 import json
+from flask_cors import CORS
+from flask_session import Session
 
 
 # load dotenv
@@ -45,11 +47,22 @@ tools = [{
 }]
 
 app = Flask(__name__)
-# Use a strong random secret key for session security in production!
 app.secret_key = os.getenv("FUNNY_KEY")
-
+app.config.update(
+    SESSION_TYPE='filesystem',
+    SESSION_COOKIE_NAME='flask_session',
+    SESSION_COOKIE_SAMESITE='Lax',
+    SESSION_COOKIE_SECURE=False,  # For local development
+    SESSION_COOKIE_HTTPONLY=True,
+)
+CORS(app, 
+    supports_credentials=True,
+    expose_headers=['Content-Type', 'Set-Cookie']
+)
+Session(app)
 
 def init_session(wardrobe):
+    print(session)
     # Initialize session conversation history if not already set.
     if 'messages' not in session:
         session['messages'] = [
@@ -58,6 +71,8 @@ def init_session(wardrobe):
 
 @app.route('/chat', methods=['POST'])
 def chat():
+    print("Current session ID:", session.sid)  # Add this
+    print("Session data:", dict(session))     # And this
     data = request.get_json()
     user_message = data.get('message')
     wardrobe = data.get('wardrobe')
@@ -90,7 +105,8 @@ def chat():
 
     # Append the assistant's reply to the session's conversation history.
     session['messages'] = messages  # update session
-
+    session.modified = True
+    
     return jsonify({"reply": text_reply, "recommendation": calls})
 
 
@@ -98,6 +114,7 @@ def chat():
 def reset():
     # Clear the conversation history to start a new session.
     session.pop('messages', None)
+    session.modified = True
     return jsonify({"status": "Conversation reset."})
 
 
