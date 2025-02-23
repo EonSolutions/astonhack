@@ -17,6 +17,7 @@ import "./App.css";
 import ChatBotPage from "./ChatBot";
 import { fetchCollections, getAllCategories } from "./lib/categories";
 import MapPage from "./Map";
+import BottomNavbar from "./BottomNavbar";
 
 export default function App() {
   const [categories, setCategories] = useState([]);
@@ -377,7 +378,7 @@ export default function App() {
 
                               <h3 className="item-title">{item.name}</h3>
 
-                              <div className="item-description">
+                              {/* <div className="item-description">
                                 {item.description.split(" ").length > 10 ? (
                                   <div>
                                     {!expandedDescriptions[item.id] ? (
@@ -404,7 +405,7 @@ export default function App() {
                                 ) : (
                                   <p>{item.description}</p>
                                 )}
-                              </div>
+                              </div> */}
                             </div>
                           ))}
                       </div>
@@ -415,26 +416,7 @@ export default function App() {
                     )}
                   </div>
 
-                  <div className="bottom-navbar">
-                    <button className="nav-btn">
-                      <AiOutlineHome size={30} />
-                    </button>
-                    <Link to="/chat" className="nav-btn">
-                      <AiOutlineMessage size={30} />
-                    </Link>
-                    <button
-                      className="nav-btn"
-                      onClick={() => setShowPopup(true)}
-                    >
-                      <AiOutlinePlus size={30} />
-                    </button>
-                    <Link to="/dashboard" className="nav-btn">
-                      <AiOutlineBarChart size={30} />
-                    </Link>
-                    <Link to="/profile" className="nav-btn">
-                      <AiOutlineUser size={30} />
-                    </Link>
-                  </div>
+                  <BottomNavbar hasMiddle={true} setShowPopup={setShowPopup}/>
 
                   {showPopup && (
                     <div

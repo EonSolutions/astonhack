@@ -92,7 +92,7 @@ export default function Dashboard() {
       </div>
 
       {/* 🔹 Use the new reusable navbar component */}
-      <BottomNavbar setShowPopup={setShowPopup} />
+      <BottomNavbar hasMiddle={false} setShowPopup={undefined} />
     </div>
   );
 }

@@ -41,6 +41,9 @@
   font-size: 1.5rem;
   cursor: pointer;
   transition: opacity 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .back-button:hover {
