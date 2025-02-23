@@ -87,6 +87,8 @@ export default function App() {
       onClose(); // Close the modal
     };
 
+    console.log(addedItems);
+
     return (
       <div className="popup-overlay" onClick={handleClose}>
         <div className="popup-content" onClick={(e) => e.stopPropagation()}>
@@ -168,16 +170,33 @@ export default function App() {
 
           const flaskData = await flaskResponse.json();
           console.log("✅ Flask Response:", flaskData);
+          
+          const fetchAllCollections = async () => {
+            const [allItems, allCategories] = await getAllCategories();
+      
+            setItems(allItems);
+            setCategories(allCategories);
+            setSelectedCategory(allCategories[0] || "");
+            setLoading(false); // Data fetching is complete
+          };
+      
+          await fetchAllCollections();
+
+          if (flaskData.type === "success") {
+            setAddedItems(flaskData.results.map(i => items.find(c => c.id === i.itemid)));
+          }
 
           // Show success message
           setShowSuccess(true);
           setShowPopup(false);
-          setTimeout(() => {
-            setShowSuccess(false);
-            window.location.reload();
-          }, 15000); // Refresh after animation ends
+          setShowAddedItemsModal(true);
 
-          alert("✅ Photo uploaded and processed successfully!");
+          
+
+          // setTimeout(() => {
+          //   setShowSuccess(false);
+          //   window.location.reload();
+          // }, 1500); // Refresh after animation ends
         } else {
           console.error("❌ Error uploading to imgBB:", imgBBData);
         }
@@ -253,6 +272,10 @@ export default function App() {
 
         // Immediately show the loading component
         setIsProcessing(true);
+
+        if (flaskData.type === "success") {
+          setAddedItems(flaskData.results);
+        }
 
         // Refresh the page after a short delay
         setTimeout(() => {
