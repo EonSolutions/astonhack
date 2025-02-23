@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { collection, getDocs, getFirestore, query, orderBy, limit } from "firebase/firestore";
 import OutfitHistoryCard from "./HistoryCard";
 import OutfitChartCard from "./ChartCard";
 import ExtraCard from "./ExtraCard";
@@ -9,29 +10,61 @@ export default function Dashboard() {
   const [categoryData, setCategoryData] = useState([]);
 
   useEffect(() => {
-    const mockData = [
-      { id: 1, date: "2025-02-20", outfit: "Casual Red T-Shirt & Jeans", category: "Shirts", image: "https://raven.contrado.app/resources/images/2020-10/155441/personalised-photo-tshirt1527448_l.jpeg?w=400" },
-      { id: 2, date: "2025-02-18", outfit: "Blue Hoodie & Sweatpants", category: "Hoodies", image: "https://images.unsplash.com/photo-1602810318660-7a7a0086a5a2?w=400" },
-      { id: 3, date: "2025-02-15", outfit: "Black Jacket & Beige Pants", category: "Jackets", image: "https://images.unsplash.com/photo-1602810318660-7a7a0086a5a3?w=400" },
-      { id: 4, date: "2025-02-10", outfit: "Casual Red T-Shirt & Jeans", category: "Shirts", image: "https://raven.contrado.app/resources/images/2020-10/155441/personalised-photo-tshirt1527448_l.jpeg?w=400" },
-      { id: 5, date: "2025-02-08", outfit: "Blue Hoodie & Sweatpants", category: "Hoodies", image: "https://images.unsplash.com/photo-1602810318660-7a7a0086a5a2?w=400" },
-    ];
+    const fetchAllCollections = async () => {
+      const db = getFirestore();
+      let allItems = [];
 
-    setOutfitHistory(mockData);
+      // 🔹 List of collections from your Firestore
+      const collections = [
+        "short_sleeve_top",
+        "long_sleeve_top",
+        "short_sleeve_outwear",
+        "long_sleeve_outwear",
+        "vest",
+        "sling",
+        "shorts",
+        "trousers",
+        "skirt",
+        "short_sleeve_dress",
+        "long_sleeve_dress",
+        "vest_dress",
+        "sling_dress"
+      ];
 
-    // Count categories
-    const categoryCount = {};
-    mockData.forEach((entry) => {
-      categoryCount[entry.category] = (categoryCount[entry.category] || 0) + 1;
-    });
+      try {
+        for (const category of collections) {
+          console.log(`Fetching documents from collection: ${category}`);
 
-    // Convert to array format
-    const formattedData = Object.keys(categoryCount).map((key) => ({
-      name: key,
-      value: categoryCount[key],
-    }));
+          // 🔹 Query Firestore collection & order by date
+          const clothesQuery = query(collection(db, category), orderBy("date", "desc"));
+          const querySnapshot = await getDocs(clothesQuery);
 
-    setCategoryData(formattedData);
+          // 🔹 Extract document data
+          const collectionItems = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            category: category,
+            name: doc.data().name || "Unnamed Item",
+            description: doc.data().description || "No description available",
+            date: doc.data().date ? new Date(doc.data().date) : new Date(0), // 🔹 FIX: Handle date correctly
+            image: doc.data().image || "",
+          }));
+
+          allItems = [...allItems, ...collectionItems];
+        }
+
+        // 🔹 Sort by date (newest first) and get the top 5 outfits
+        allItems.sort((a, b) => b.date - a.date);
+        const top5NewOutfits = allItems.slice(0, 5);
+
+        console.log("🔥 Top 5 newest worn clothes:", top5NewOutfits);
+        setOutfitHistory(top5NewOutfits);
+
+      } catch (error) {
+        console.error("❌ Error fetching collections:", error);
+      }
+    };
+
+    fetchAllCollections();
   }, []);
 
   return (

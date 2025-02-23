@@ -26,3 +26,4 @@ dist-ssr
 # Python
 *.pyc
 .env
+venv/
