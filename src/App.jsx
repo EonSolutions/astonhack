@@ -90,7 +90,7 @@ export default function App() {
     console.log(addedItems);
 
     return (
-      <div className="popup-overlay" onClick={handleClose}>
+      <div className="popup-overlay">
         <div className="popup-content" onClick={(e) => e.stopPropagation()}>
           <h3>Items Added Successfully!</h3>
           <ul>
@@ -170,28 +170,29 @@ export default function App() {
 
           const flaskData = await flaskResponse.json();
           console.log("✅ Flask Response:", flaskData);
-          
-          const fetchAllCollections = async () => {
-            const [allItems, allCategories] = await getAllCategories();
-      
-            setItems(allItems);
-            setCategories(allCategories);
-            setSelectedCategory(allCategories[0] || "");
-            setLoading(false); // Data fetching is complete
-          };
-      
-          await fetchAllCollections();
+
+          // Wait 100ms
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
+          const [allItems, allCategories] = await getAllCategories();
+
+          setItems(allItems);
+          setCategories(allCategories);
+          setSelectedCategory(allCategories[0] || "");
+          setLoading(false); // Data fetching is complete
 
           if (flaskData.type === "success") {
-            setAddedItems(flaskData.results.map(i => items.find(c => c.id === i.itemid)));
+            setAddedItems(
+              flaskData.results.map((i) =>
+                allItems.find((c) => c.id === i.itemid)
+              )
+            );
           }
 
           // Show success message
           setShowSuccess(true);
           setShowPopup(false);
           setShowAddedItemsModal(true);
-
-          
 
           // setTimeout(() => {
           //   setShowSuccess(false);
