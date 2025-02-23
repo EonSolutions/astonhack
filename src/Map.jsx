@@ -62,7 +62,7 @@ const MapView = () => {
 
   return (
     <>
-      <header className="wardrobe-header">Sell My Clothes</header>
+      <header className="wardrobe-header">Give Back</header>
       <BottomNavbar hasMiddle={false} setShowPopup={undefined} />
       <div
         className="map-container"
