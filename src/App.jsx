@@ -45,6 +45,8 @@ export default function App() {
   const [showCameraPopup, setShowCameraPopup] = useState(false);
   const [videoStream, setVideoStream] = useState(null);
   const [expandedDescriptions, setExpandedDescriptions] = useState({});
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -84,30 +86,34 @@ export default function App() {
   };
 
   const handleTakePhoto = () => {
-    console.log("Capturing photo...");
+    console.log("📸 Capturing photo...");
 
     if (!videoRef.current || !canvasRef.current) {
-      console.warn("Video or Canvas element not found!");
+      console.warn("⚠️ Video or Canvas element not found!");
       return;
     }
+
+    setIsProcessing(true); // Show loading animation
 
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-    console.log("Photo captured and drawn onto canvas.");
+    console.log("✅ Photo captured and drawn onto canvas.");
 
     canvas.toBlob(async (blob) => {
       if (!blob) {
-        console.warn("Failed to capture photo as blob.");
+        console.warn("⚠️ Failed to capture photo as blob.");
+        setIsProcessing(false);
         return;
       }
 
-      console.log("Uploading photo to imgBB...");
+      console.log("🔄 Uploading photo to imgBB...");
 
       const formData = new FormData();
       formData.append("image", blob);
 
       try {
+        // Upload image to imgBB
         const imgBBResponse = await fetch(`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_KEY}`, {
           method: "POST",
           body: formData,
@@ -119,31 +125,40 @@ export default function App() {
           const imageUrl = imgBBData.data.url;
           console.log("✅ Image uploaded to imgBB:", imageUrl);
 
-          // 🔹 Store the image URL in Firestore
+          // Store the image URL in Firestore
           await addDoc(collection(db, "shirts"), { image: imageUrl });
           console.log("✅ Photo URL saved to Firestore database.");
 
-          // 🔹 Send the image URL to Flask API
+          // Send image to Flask for processing
           const flaskResponse = await fetch("http://127.0.0.1:5000/process_image", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ image_url: imageUrl })
           });
 
           const flaskData = await flaskResponse.json();
           console.log("✅ Flask Response:", flaskData);
 
-          alert("Photo uploaded and processed successfully!");
+          // Show success message
+          setShowSuccess(true);
+          setShowPopup(false);
+          setTimeout(() => {
+            setShowSuccess(false);
+            window.location.reload(); 
+          }, 1500); // Refresh after animation ends
+
+          alert("✅ Photo uploaded and processed successfully!");
         } else {
           console.error("❌ Error uploading to imgBB:", imgBBData);
         }
       } catch (error) {
         console.error("❌ Error:", error);
+      } finally {
+        setIsProcessing(false); // Stop loading animation
       }
     }, "image/jpeg");
   };
+
 
   const handleUploadPhoto = () => {
     const fileInput = document.createElement('input');
@@ -245,6 +260,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={
           <div className="wardrobe-container">
+
             <header className="wardrobe-header">My Wardrobe</header>
 
             <div className="main-content">
@@ -342,6 +358,21 @@ export default function App() {
                   <button className="popup-btn" onClick={handleTakePhoto}>Capture Photo</button>
                   <button className="close-btn" onClick={() => setShowCameraPopup(false)}>Close</button>
                 </div>
+              </div>
+            )}
+
+            {isProcessing && (
+              <div className="loading-overlay">
+                <div className="loading-container">
+                  <div className="loading-spinner"></div>
+                  <p className="loading-text">Processing image...</p>
+                </div>
+              </div>
+            )}
+
+            {showSuccess && (
+              <div className="success-toast">
+                ✅ Your outfit has been added!
               </div>
             )}
           </div>

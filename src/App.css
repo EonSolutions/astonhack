@@ -376,7 +376,7 @@ p {
 /* Camera Preview Video */
 .camera-preview {
   width: 100%;
-  max-width: 400px;
+  max-width: 600px;
   height: auto;
   border-radius: 8px;
   background: black;
@@ -439,4 +439,60 @@ p {
 
 .see-description-btn:hover {
   color: #0056b3;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loading-spinner {
+  width: 80px;
+  height: 80px;
+  border: 6px solid rgba(255, 255, 255, 0.3);
+  border-top: 6px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px; /* Space between spinner and text */
+  align-items: center;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 📜 PROCESSING TEXT */
+.loading-text {
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-align: center;
+  margin-top: 10px; /* Ensure spacing between spinner & text */
+  animation: fadeInOut 1.5s infinite alternate;
+}
+
+/* 🔄 SPINNING ANIMATION */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ✨ FADE IN/OUT ANIMATION */
+@keyframes fadeInOut {
+  from { opacity: 0.5; }
+  to { opacity: 1; }
 }
