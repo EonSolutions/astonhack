@@ -14,7 +14,7 @@ import "./Dashboard.css";
 export default function Dashboard() {
   const [outfitHistory, setOutfitHistory] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
-  const [showPopup, setShowPopup] = useState(false); // 🔹 Add this state for the Plus button
+  const [barData, setBarData] = useState([]);
 
   useEffect(() => {
     const fetchAllCollections = async () => {
@@ -75,6 +75,41 @@ export default function Dashboard() {
 
         console.log("📊 Outfit Category Breakdown:", formattedCategoryData);
         setCategoryData(formattedCategoryData);
+
+        // Set up bar data: each bar is the number of clothes in a certain date range:
+        const today = new Date();
+        const oneWeekAgo = new Date(today);
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        const oneMonthAgo = new Date(today);
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        const threeMonthsAgo = new Date(today);
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+        const sixMonthsAgo = new Date(today);
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+        const oneYearAgo = new Date(today);
+        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+        const dateRanges = [
+          { name: "Past Week", start: oneWeekAgo, end: today },
+          { name: "Past Month", start: oneMonthAgo, end: today },
+          { name: "Past 3 Months", start: threeMonthsAgo, end: today },
+          { name: "Past 6 Months", start: sixMonthsAgo, end: today },
+          { name: "Past Year", start: oneYearAgo, end: today },
+        ];
+
+        const barData = dateRanges.map((range) => {
+          const clothesInDateRange = allItems.filter(
+            (item) => item.date >= range.start && item.date <= range.end
+          );
+          return {
+            name: range.name,
+            value: clothesInDateRange.length,
+          };
+        });
+
+        console.log("📊 Outfit Date Range Breakdown:", barData);
+        setBarData(barData);
+
       } catch (error) {
         console.error("❌ Error fetching collections:", error);
       }
@@ -94,7 +129,7 @@ export default function Dashboard() {
 
         {/* Right Side - Pie Chart (Top) & Extra Info (Bottom) */}
         <div className="right-column">
-          <OutfitChartCard categoryData={categoryData} />
+          <OutfitChartCard categoryData={categoryData} barData={barData}/>
         </div>
       </div>
 

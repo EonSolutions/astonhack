@@ -40,7 +40,7 @@ p {
 .wardrobe-header {
   width: 100vw;
   padding: 15px 0;
-  font-size: 30px;
+  font-size: 2rem;
   font-weight: bold;
   background: linear-gradient(90deg, #a855f7, #d946ef);
   text-align: center;

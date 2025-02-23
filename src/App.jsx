@@ -351,7 +351,7 @@ export default function App() {
 
               {!loading && !isProcessing && (
                 <>
-                  <header className="wardrobe-header">My Wardrobe</header>
+                  <header className="wardrobe-header">RE:STYLE</header>
 
                   <div className="main-content">
                     <div className="category-buttons">
