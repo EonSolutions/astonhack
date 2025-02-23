@@ -35,7 +35,6 @@ fetchCollections().then(formattedCategories => {
 
 
 export default function App() {
-
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("long_sleeve_top");
   const [items, setItems] = useState([]);
@@ -47,6 +46,7 @@ export default function App() {
   const [expandedDescriptions, setExpandedDescriptions] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -144,7 +144,7 @@ export default function App() {
           setShowPopup(false);
           setTimeout(() => {
             setShowSuccess(false);
-            window.location.reload(); 
+            window.location.reload();
           }, 1500); // Refresh after animation ends
 
           alert("✅ Photo uploaded and processed successfully!");
@@ -198,6 +198,15 @@ export default function App() {
     }
   };
 
+  const LoadingComponent = () => (
+    <div className="loading-overlay">
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p className="loading-text">Loading wardrobe...</p>
+      </div>
+    </div>
+  );
+
   useEffect(() => {
     const fetchAllCollections = async () => {
       let allItems = [];
@@ -234,149 +243,142 @@ export default function App() {
       setItems(allItems);
       setCategories(allCategories);
       setSelectedCategory(allCategories[0] || "");
+      setLoading(false); // Data fetching is complete
     };
 
     fetchAllCollections();
   }, []);
 
-
-  useEffect(() => {
-    const fetchAndSetCategories = async () => {
-      const formattedCategories = await fetchCollections();
-      console.log("✅ Final Categories:", formattedCategories); // Debugging
-
-      if (formattedCategories.length > 0) {
-        setCategories(formattedCategories); // ✅ Ensure categories are set
-        setSelectedCategory(formattedCategories[0]); // ✅ Set first category as default
-      }
-    };
-
-    fetchAndSetCategories();
-  }, []);
-
-
   return (
     <Router>
       <Routes>
-        <Route path="/" element={
-          <div className="wardrobe-container">
-
-            <header className="wardrobe-header">My Wardrobe</header>
-
-            <div className="main-content">
-              <div className="category-buttons">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    className={`category-btn ${selectedCategory === category ? "active" : ""}`}
-                    onClick={() => setSelectedCategory(category)}
-                  >
-                    {category} {/* 🔹 Already formatted */}
-                  </button>
-                ))}
-              </div>
-
-              {items.length > 0 ? (
-                <div className="item-grid">
-                  {items
-                    .filter((item) => item.category === selectedCategory)
-                    .map((item) => (
-                      <div className="item-card">
-                        <div className="item-image-container">
-                          <img src={item.image} alt={item.name} className="item-image" />
-                        </div>
-
-                        <h3 className="item-title">{item.name}</h3>
-
-                        <div className="item-description">
-                          {item.description.split(" ").length > 10 ? (
-                            <div>
-                              {!expandedDescriptions[item.id] ? (
-                                <p>{item.description.split(" ").slice(0, 10).join(" ")}...</p>
-                              ) : (
-                                <p>{item.description}</p>
-                              )}
-
-                              <button
-                                className="see-description-btn"
-                                onClick={() => toggleDescription(item.id)}
-                              >
-                                {expandedDescriptions[item.id] ? "Hide Description" : "See Description"}
-                              </button>
-                            </div>
-                          ) : (
-                            <p>{item.description}</p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                </div>
+        <Route
+          path="/"
+          element={
+            <div className="wardrobe-container">
+              {loading ? (
+                <LoadingComponent />
               ) : (
-                <div className="empty-category">
-                  <p>No items in this category</p>
-                </div>
-              )}
-            </div>
+                <>
+                  <header className="wardrobe-header">My Wardrobe</header>
 
-            <div className="bottom-navbar">
-              <button className="nav-btn"><AiOutlineHome size={30} /></button>
-              <button className="nav-btn"><AiOutlineMessage size={30} /></button>
-              <button className="nav-btn" onClick={() => setShowPopup(true)}><AiOutlinePlus size={30} /></button>
-              <Link to="/dashboard" className="nav-btn"><AiOutlineBarChart size={30} /></Link>
-              <Link to="/profile" className="nav-btn"><AiOutlineUser size={30} /></Link>
-            </div>
+                  <div className="main-content">
+                    <div className="category-buttons">
+                      {categories.map((category) => (
+                        <button
+                          key={category}
+                          className={`category-btn ${selectedCategory === category ? "active" : ""}`}
+                          onClick={() => setSelectedCategory(category)}
+                        >
+                          {category}
+                        </button>
+                      ))}
+                    </div>
 
-            {showPopup && (
-              <div className={`popup-overlay ${isUploadClosing ? "closing" : ""}`} onClick={closePopup}>
-                <div className={`popup-content ${isUploadClosing ? "closing" : ""}`} onClick={(e) => e.stopPropagation()}>
-                  <div
-                    className={`upload-box ${isDragging ? "dragging" : ""}`}
-                    onDragEnter={handleDragStart}
-                    onDragOver={handleDragStart}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                  >
-                    <AiOutlineCloudUpload className="upload-icon" />
-                    <p className="upload-text">Drag & drop your files here or</p>
-                    <button className="upload-btn">Choose files</button>
+                    {items.length > 0 ? (
+                      <div className="item-grid">
+                        {items
+                          .filter((item) => item.category === selectedCategory)
+                          .map((item) => (
+                            <div className="item-card" key={item.id}>
+                              <div className="item-image-container">
+                                <img src={item.image} alt={item.name} className="item-image" />
+                              </div>
+
+                              <h3 className="item-title">{item.name}</h3>
+
+                              <div className="item-description">
+                                {item.description.split(" ").length > 10 ? (
+                                  <div>
+                                    {!expandedDescriptions[item.id] ? (
+                                      <p>{item.description.split(" ").slice(0, 10).join(" ")}...</p>
+                                    ) : (
+                                      <p>{item.description}</p>
+                                    )}
+
+                                    <button
+                                      className="see-description-btn"
+                                      onClick={() => toggleDescription(item.id)}
+                                    >
+                                      {expandedDescriptions[item.id] ? "Hide Description" : "See Description"}
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <p>{item.description}</p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    ) : (
+                      <div className="empty-category">
+                        <p>No items in this category</p>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Take Photo Button */}
-                  <button className="take-photo-btn" onClick={handleOpenCamera}>
-                    <AiOutlineCamera className="camera-icon" /> Take a Photo
-                  </button>
-                </div>
-              </div>
-            )}
+                  <div className="bottom-navbar">
+                    <button className="nav-btn"><AiOutlineHome size={30} /></button>
+                    <button className="nav-btn"><AiOutlineMessage size={30} /></button>
+                    <button className="nav-btn" onClick={() => setShowPopup(true)}><AiOutlinePlus size={30} /></button>
+                    <Link to="/dashboard" className="nav-btn"><AiOutlineBarChart size={30} /></Link>
+                    <Link to="/profile" className="nav-btn"><AiOutlineUser size={30} /></Link>
+                  </div>
 
-            {/* Camera Popup */}
-            {showCameraPopup && (
-              <div className="popup-overlay" onClick={() => setShowCameraPopup(false)}>
-                <div className="camera-popup">
-                  <video ref={videoRef} className="camera-preview" autoPlay playsInline></video>
-                  <canvas ref={canvasRef} width="300" height="200" style={{ display: "none" }}></canvas>
-                  <button className="popup-btn" onClick={handleTakePhoto}>Capture Photo</button>
-                  <button className="close-btn" onClick={() => setShowCameraPopup(false)}>Close</button>
-                </div>
-              </div>
-            )}
+                  {showPopup && (
+                    <div className={`popup-overlay ${isUploadClosing ? "closing" : ""}`} onClick={closePopup}>
+                      <div className={`popup-content ${isUploadClosing ? "closing" : ""}`} onClick={(e) => e.stopPropagation()}>
+                        <div
+                          className={`upload-box ${isDragging ? "dragging" : ""}`}
+                          onDragEnter={handleDragStart}
+                          onDragOver={handleDragStart}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                        >
+                          <AiOutlineCloudUpload className="upload-icon" />
+                          <p className="upload-text">Drag & drop your files here or</p>
+                          <button className="upload-btn">Choose files</button>
+                        </div>
 
-            {isProcessing && (
-              <div className="loading-overlay">
-                <div className="loading-container">
-                  <div className="loading-spinner"></div>
-                  <p className="loading-text">Processing image...</p>
-                </div>
-              </div>
-            )}
+                        {/* Take Photo Button */}
+                        <button className="take-photo-btn" onClick={handleOpenCamera}>
+                          <AiOutlineCamera className="camera-icon" /> Take a Photo
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
-            {showSuccess && (
-              <div className="success-toast">
-                ✅ Your outfit has been added!
-              </div>
-            )}
-          </div>
-        } />
+                  {/* Camera Popup */}
+                  {showCameraPopup && (
+                    <div className="popup-overlay" onClick={() => setShowCameraPopup(false)}>
+                      <div className="camera-popup">
+                        <video ref={videoRef} className="camera-preview" autoPlay playsInline></video>
+                        <canvas ref={canvasRef} width="300" height="200" style={{ display: "none" }}></canvas>
+                        <button className="popup-btn" onClick={handleTakePhoto}>Capture Photo</button>
+                        <button className="close-btn" onClick={() => setShowCameraPopup(false)}>Close</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {isProcessing && (
+                    <div className="loading-overlay">
+                      <div className="loading-container">
+                        <div className="loading-spinner"></div>
+                        <p className="loading-text">Processing image...</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {showSuccess && (
+                    <div className="success-toast">
+                      ✅ Your outfit has been added!
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          }
+        />
         <Route path="/profile" element={<Profile />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
