@@ -1,7 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import { collection, addDoc } from "firebase/firestore";
-import { AiOutlineHome, AiOutlinePlus, AiOutlineUser, AiOutlineMessage, AiOutlineCloudUpload, AiOutlineCamera, AiOutlineBarChart } from "react-icons/ai";
+import {
+  AiOutlineHome,
+  AiOutlinePlus,
+  AiOutlineUser,
+  AiOutlineMessage,
+  AiOutlineCloudUpload,
+  AiOutlineCamera,
+  AiOutlineBarChart,
+} from "react-icons/ai";
 import { db } from "./lib/firebase";
 import Profile from "./Profile";
 import Dashboard from "./Dashboard";
@@ -9,7 +17,6 @@ import "./App.css";
 import ChatBotPage from "./ChatBot";
 import { fetchCollections, getAllCategories } from "./lib/categories";
 import MapPage from "./Map";
-
 
 export default function App() {
   const [categories, setCategories] = useState([]);
@@ -60,13 +67,14 @@ export default function App() {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           videoRef.current.onloadedmetadata = () => {
-            videoRef.current.play().catch(error => console.error("Error playing video:", error));
+            videoRef.current
+              .play()
+              .catch((error) => console.error("Error playing video:", error));
           };
           // console.log("Video stream set to videoRef and playing.");
         }
         setVideoStream(stream);
       }, 200); // Small delay to ensure popup is fully mounted
-
     } catch (error) {
       console.error("Error accessing camera:", error);
       alert("Error accessing camera: " + error.message);
@@ -83,16 +91,17 @@ export default function App() {
       <div className="popup-overlay" onClick={handleClose}>
         <div className="popup-content" onClick={(e) => e.stopPropagation()}>
           <h3>Items Added Successfully!</h3>
-          <p>{addedItems.length} item(s) have been added!</p>
-          {/* <ul>
+          <ul>
             {addedItems.map((item) => (
               <li key={item.id}>
                 <strong>{item.name}</strong> - {item.description}
               </li>
             ))}
-          </ul> */}
+          </ul>
           {/* Move the Close button here */}
-          <button className="close-btn" onClick={handleClose}>Close</button>
+          <button className="close-btn" onClick={handleClose}>
+            Close
+          </button>
         </div>
       </div>
     );
@@ -127,10 +136,15 @@ export default function App() {
 
       try {
         // Upload image to imgBB
-        const imgBBResponse = await fetch(`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_KEY}`, {
-          method: "POST",
-          body: formData,
-        });
+        const imgBBResponse = await fetch(
+          `https://api.imgbb.com/1/upload?key=${
+            import.meta.env.VITE_IMGBB_KEY
+          }`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
         const imgBBData = await imgBBResponse.json();
 
@@ -143,11 +157,14 @@ export default function App() {
           console.log("✅ Photo URL saved to Firestore database.");
 
           // Send image to Flask for processing
-          const flaskResponse = await fetch("http://127.0.0.1:5000/process_image", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image_url: imageUrl })
-          });
+          const flaskResponse = await fetch(
+            "http://127.0.0.1:5000/process_image",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ image_url: imageUrl }),
+            }
+          );
 
           const flaskData = await flaskResponse.json();
           console.log("✅ Flask Response:", flaskData);
@@ -157,7 +174,7 @@ export default function App() {
           setShowPopup(false);
           setTimeout(() => {
             setShowSuccess(false);
-            window.location.reload(); 
+            window.location.reload();
           }, 15000); // Refresh after animation ends
 
           alert("✅ Photo uploaded and processed successfully!");
@@ -186,10 +203,13 @@ export default function App() {
 
     try {
       // Upload image to imgBB
-      const imgBBResponse = await fetch(`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_KEY}`, {
-        method: "POST",
-        body: formData,
-      });
+      const imgBBResponse = await fetch(
+        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_KEY}`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const imgBBData = await imgBBResponse.json();
 
@@ -209,16 +229,20 @@ export default function App() {
         console.log("✅ Photo URL saved to Firestore database.");
 
         // Save the added item to localStorage
-        const existingItems = JSON.parse(localStorage.getItem("addedItems")) || [];
+        const existingItems =
+          JSON.parse(localStorage.getItem("addedItems")) || [];
         const updatedItems = [...existingItems, newItem];
         localStorage.setItem("addedItems", JSON.stringify(updatedItems));
 
         // Send image to Flask for processing
-        const flaskResponse = await fetch("http://127.0.0.1:5000/process_image", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ image_url: imageUrl }),
-        });
+        const flaskResponse = await fetch(
+          "http://127.0.0.1:5000/process_image",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image_url: imageUrl }),
+          }
+        );
 
         const flaskData = await flaskResponse.json();
         console.log("✅ Flask Response:", flaskData);
@@ -327,7 +351,9 @@ export default function App() {
                       {categories.map((category) => (
                         <button
                           key={category}
-                          className={`category-btn ${selectedCategory === category ? "active" : ""}`}
+                          className={`category-btn ${
+                            selectedCategory === category ? "active" : ""
+                          }`}
                           onClick={() => setSelectedCategory(category)}
                         >
                           {category}
@@ -342,7 +368,11 @@ export default function App() {
                           .map((item) => (
                             <div className="item-card" key={item.id}>
                               <div className="item-image-container">
-                                <img src={item.image} alt={item.name} className="item-image" />
+                                <img
+                                  src={item.image}
+                                  alt={item.name}
+                                  className="item-image"
+                                />
                               </div>
 
                               <h3 className="item-title">{item.name}</h3>
@@ -351,7 +381,13 @@ export default function App() {
                                 {item.description.split(" ").length > 10 ? (
                                   <div>
                                     {!expandedDescriptions[item.id] ? (
-                                      <p>{item.description.split(" ").slice(0, 10).join(" ")}...</p>
+                                      <p>
+                                        {item.description
+                                          .split(" ")
+                                          .slice(0, 10)
+                                          .join(" ")}
+                                        ...
+                                      </p>
                                     ) : (
                                       <p>{item.description}</p>
                                     )}
@@ -360,7 +396,9 @@ export default function App() {
                                       className="see-description-btn"
                                       onClick={() => toggleDescription(item.id)}
                                     >
-                                      {expandedDescriptions[item.id] ? "Hide Description" : "See Description"}
+                                      {expandedDescriptions[item.id]
+                                        ? "Hide Description"
+                                        : "See Description"}
                                     </button>
                                   </div>
                                 ) : (
@@ -378,26 +416,58 @@ export default function App() {
                   </div>
 
                   <div className="bottom-navbar">
-                    <button className="nav-btn"><AiOutlineHome size={30} /></button>
-                    <Link to="/chat" className="nav-btn"><AiOutlineMessage size={30} /></Link>
-                    <button className="nav-btn" onClick={() => setShowPopup(true)}><AiOutlinePlus size={30} /></button>
-                    <Link to="/dashboard" className="nav-btn"><AiOutlineBarChart size={30} /></Link>
-                    <Link to="/profile" className="nav-btn"><AiOutlineUser size={30} /></Link>
+                    <button className="nav-btn">
+                      <AiOutlineHome size={30} />
+                    </button>
+                    <Link to="/chat" className="nav-btn">
+                      <AiOutlineMessage size={30} />
+                    </Link>
+                    <button
+                      className="nav-btn"
+                      onClick={() => setShowPopup(true)}
+                    >
+                      <AiOutlinePlus size={30} />
+                    </button>
+                    <Link to="/dashboard" className="nav-btn">
+                      <AiOutlineBarChart size={30} />
+                    </Link>
+                    <Link to="/profile" className="nav-btn">
+                      <AiOutlineUser size={30} />
+                    </Link>
                   </div>
 
                   {showPopup && (
-                    <div className={`popup-overlay ${isUploadClosing ? "closing" : ""}`} onClick={closePopup}>
-                      <div className={`popup-content ${isUploadClosing ? "closing" : ""}`} onClick={(e) => e.stopPropagation()}>
+                    <div
+                      className={`popup-overlay ${
+                        isUploadClosing ? "closing" : ""
+                      }`}
+                      onClick={closePopup}
+                    >
+                      <div
+                        className={`popup-content ${
+                          isUploadClosing ? "closing" : ""
+                        }`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <div
-                          className={`upload-box ${isDragging ? "dragging" : ""}`}
+                          className={`upload-box ${
+                            isDragging ? "dragging" : ""
+                          }`}
                           onDragEnter={handleDragStart}
                           onDragOver={handleDragStart}
                           onDragLeave={handleDragLeave}
                           onDrop={handleDrop}
                         >
                           <AiOutlineCloudUpload className="upload-icon" />
-                          <p className="upload-text">Drag & drop your files here or</p>
-                          <button className="upload-btn" onClick={() => document.getElementById("file-input").click()}>
+                          <p className="upload-text">
+                            Drag & drop your files here or
+                          </p>
+                          <button
+                            className="upload-btn"
+                            onClick={() =>
+                              document.getElementById("file-input").click()
+                            }
+                          >
                             Choose files
                           </button>
                           <input
@@ -410,8 +480,12 @@ export default function App() {
                         </div>
 
                         {/* Take Photo Button */}
-                        <button className="take-photo-btn" onClick={handleOpenCamera}>
-                          <AiOutlineCamera className="camera-icon" /> Take a Photo
+                        <button
+                          className="take-photo-btn"
+                          onClick={handleOpenCamera}
+                        >
+                          <AiOutlineCamera className="camera-icon" /> Take a
+                          Photo
                         </button>
                       </div>
                     </div>
@@ -419,12 +493,32 @@ export default function App() {
 
                   {/* Camera Popup */}
                   {showCameraPopup && (
-                    <div className="popup-overlay" onClick={() => setShowCameraPopup(false)}>
+                    <div
+                      className="popup-overlay"
+                      onClick={() => setShowCameraPopup(false)}
+                    >
                       <div className="camera-popup">
-                        <video ref={videoRef} className="camera-preview" autoPlay playsInline></video>
-                        <canvas ref={canvasRef} width="300" height="200" style={{ display: "none" }}></canvas>
-                        <button className="popup-btn" onClick={handleTakePhoto}>Capture Photo</button>
-                        <button className="close-btn" onClick={() => setShowCameraPopup(false)}>Close</button>
+                        <video
+                          ref={videoRef}
+                          className="camera-preview"
+                          autoPlay
+                          playsInline
+                        ></video>
+                        <canvas
+                          ref={canvasRef}
+                          width="300"
+                          height="200"
+                          style={{ display: "none" }}
+                        ></canvas>
+                        <button className="popup-btn" onClick={handleTakePhoto}>
+                          Capture Photo
+                        </button>
+                        <button
+                          className="close-btn"
+                          onClick={() => setShowCameraPopup(false)}
+                        >
+                          Close
+                        </button>
                       </div>
                     </div>
                   )}
@@ -439,7 +533,10 @@ export default function App() {
                   )}
 
                   {showAddedItemsModal && (
-                    <AddedItemsModal addedItems={addedItems} onClose={() => setShowAddedItemsModal(false)} />
+                    <AddedItemsModal
+                      addedItems={addedItems}
+                      onClose={() => setShowAddedItemsModal(false)}
+                    />
                   )}
                 </>
               )}
